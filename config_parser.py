@@ -1,7 +1,7 @@
 import sys
 import os
 
-def parse_coordinate(coordinates, height, width):
+def parse_coordinate(coordinates: str, height: int, width: int) -> tuple[int, int]:
     try:
         cords = coordinates.split(',')
         if len(cords) != 2:
@@ -15,8 +15,9 @@ def parse_coordinate(coordinates, height, width):
     except ValueError:
         print(f"Error: Invalid coordinate '{coordinates}'. Expected integers 'x,y'.")
         sys.exit(1)
+    return (x, y)
 
-def val_dimensions(parsed_dict):
+def val_dimensions(parsed_dict: dict) -> dict:
     try:
         width_value = int(parsed_dict['WIDTH'])
         height_value = int(parsed_dict['HEIGHT'])
@@ -27,33 +28,37 @@ def val_dimensions(parsed_dict):
     except ValueError:
         print("Error: WIDTH and HEIGHT must be integers.")
         sys.exit(1)
-    return width_value, height_value
+    parsed_dict['WIDTH'] = width_value
+    parsed_dict['HEIGHT'] = height_value
+    return parsed_dict
 
-def val_keys(parsed_dict):
+def val_keys(parsed_dict: dict) -> list[str]:
     allowed_keys = ['WIDTH', 'HEIGHT', 'ENTRY', 'EXIT', 'OUTPUT_FILE', 'PERFECT']
+    bonus_keys = []
     #looping through parsed_dict looking for any unsupported keys
     for key in parsed_dict:
         if key not in allowed_keys:
-            print(f"Error: Unknown or unsupported key '{key}'.")
-            sys.exit(1)
+            bonus_keys.append(key)
     #looping through allowed_keys checking for missing keys
     for key in allowed_keys:
         if key not in parsed_dict:
             print(f"Error: Missing mandatory key '{key}'.")
             sys.exit(1)
+    return bonus_keys
 
-def val_bool(parsed_dict):
-    raw_perfect = parsed_dict['PERFECT']
-    if raw_perfect == "True":
-        perfect_val = True
-    elif raw_perfect == "False":
-        perfect_val = False
+def val_bool(parsed_dict: dict) -> dict:
+    parsed_dict['PERFECT'] = parsed_dict['PERFECT'].strip().lower()
+    if parsed_dict['PERFECT'] == "true":
+        parsed_dict['PERFECT'] = True
+        return parsed_dict
+    elif parsed_dict['PERFECT'] == "false":
+        parsed_dict['PERFECT'] = False
+        return parsed_dict
     else:
-        print(f"Error: PERFECT must be 'True' or 'False'. Found '{raw_perfect}'.")
+        print(f"Error: PERFECT must be 'True' or 'False'. Found '{parsed_dict['PERFECT']}'.")
         sys.exit(1)
-    return raw_perfect
 
-def val_file(parsed_dict):
+def val_file(parsed_dict: dict) -> None:
     #does it end with .txt?
     if not parsed_dict['OUTPUT_FILE'].endswith('.txt'):
         print("Error: 'OUTPUT_FILE' must end with .txt")
@@ -68,7 +73,7 @@ def val_file(parsed_dict):
         print("Error: Path doesn't exist for 'OUTPUT_FILE'")
         sys.exit(1)
 
-def file_to_dict(filename):
+def file_to_dict(filename: str) -> dict:
     try:
         with open(filename, "r") as file:
             parsed_dict = {}
@@ -83,19 +88,19 @@ def file_to_dict(filename):
                 if line.startswith('#'):
                     continue
                 #splitting when first '=' is found
-                line = line.split(sep='=', maxsplit=1)
+                parts = line.split(sep='=', maxsplit=1)
                 #check if '=' exists
-                if len(line) != 2:
+                if len(parts) != 2:
                     continue
                 #adding result to the dict
-                parsed_dict.update({line[0].strip() : line[1].strip()})
+                parsed_dict.update({parts[0].strip() : parts[1].strip()})
     #handling if file was not found error
     except FileNotFoundError:
-        print(f"Error: the file '{sys.argv[1]} was not found")
+        print(f"Error: the file '{filename} was not found")
         sys.exit(1)
     #handling permission denied error
     except PermissionError:
-        print(f"Error: you do not have permission to read '{sys.argv[1]}'")
+        print(f"Error: you do not have permission to read '{filename}'")
         sys.exit(1)
     except Exception as e:
         print(f"Unexpected error: {e}")
