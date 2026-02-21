@@ -112,6 +112,7 @@ class ConfigPasrer:
         except Exception as e:
             print(f"Unexpected error: {e}")
             sys.exit(1)
+
         return parsed_dict
 
     def parse(self) -> None:
