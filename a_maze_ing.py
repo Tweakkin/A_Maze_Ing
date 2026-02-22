@@ -1,22 +1,11 @@
 import sys
 from config_parser import ConfigPasrer
+from mazegenerator import MazeGenerator
 
-class MazeGenerator:
-    def __init__(self, width: int, height: int) -> None:
-        self.width = width
-        self.height = height
-
-        self.grid = []
-        for _ in range(height):
-            temp = []
-            for _ in range(width):
-                temp.append(15)
-            self.grid.append(temp)
-    
-    def get_cell(self, x:int, y:int) -> int:
-        return self.grid[x][y]
-
-    
+NORTH = 1
+EAST = 2
+SOUTH = 4
+WEST = 8
 
 if __name__ == "__main__":
 
@@ -28,7 +17,21 @@ if __name__ == "__main__":
     toparse = ConfigPasrer(sys.argv[1])
     toparse.parse()
     
-    gen = MazeGenerator(toparse.parsed_dict['WIDTH'], toparse.parsed_dict['HEIGHT'])
-    
-    a = 15
-    print(5 & 2)
+    try:
+        gen = MazeGenerator(toparse.parsed_dict['WIDTH'], toparse.parsed_dict['HEIGHT'])
+        
+        gen.print_grid()
+        gen.display()
+        print()
+        gen.dfs_algo()
+        gen.print_grid()
+        gen.display()
+
+        if toparse.parsed_dict['PERFECT'] == False:
+            tot = (toparse.parsed_dict['HEIGHT'] * toparse.parsed_dict['WIDTH']) * 0.1
+            gen.make_imperfect(tot)
+            gen.display()
+        print()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
