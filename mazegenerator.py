@@ -21,18 +21,18 @@ DIRECTION_D = {
 
 class MazeGenerator:
 
-    def __init__(self, width: int, height: int) -> None:
-        if not isinstance(width, int) or width <= 0:
+    def __init__(self, parsed_dict: dict) -> None:
+        if not isinstance(parsed_dict['WIDTH'], int) or parsed_dict['WIDTH'] <= 0:
             raise ValueError('width must be a positive integer!')
-        if not isinstance(height, int) or height <= 0:
+        if not isinstance(parsed_dict['HEIGHT'], int) or parsed_dict['HEIGHT'] <= 0:
             raise ValueError('height must be a positive integer!')
-        self.width = width
-        self.height = height
-
+        self.config = parsed_dict
+        self.width = parsed_dict['WIDTH']
+        self.height = parsed_dict['HEIGHT']
         self.grid = []
-        for _ in range(height):
+        for _ in range(self.height):
             temp = []
-            for _ in range(width):
+            for _ in range(self.width):
                 temp.append(15)
             self.grid.append(temp)
     
@@ -41,6 +41,29 @@ class MazeGenerator:
             raise IndexError(f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
         return self.grid[y][x]
     
+    def set_entry_exit(self):
+        x_entry, y_entry = self.config['ENTRY']
+        x_exit, y_exit = self.config['EXIT']
+        
+        if y_entry == 0:
+            self.remove_wall(x_entry, y_entry, NORTH)
+        elif y_entry == self.height - 1:
+            self.remove_wall(x_entry, y_entry, SOUTH)
+        elif x_entry == 0:
+            self.remove_wall(x_entry, y_entry, WEST)
+        elif x_entry == self.width - 1:
+            self.remove_wall(x_entry, y_entry, EAST)
+        
+        if y_exit == 0:
+            self.remove_wall(x_exit, y_exit, NORTH)
+        elif y_exit == self.height - 1:
+            self.remove_wall(x_exit, y_exit, SOUTH)
+        elif x_exit == 0:
+            self.remove_wall(x_exit, y_exit, WEST)
+        elif x_exit == self.width - 1:
+            self.remove_wall(x_exit, y_exit, EAST)
+
+
     def has_wall(self, x:int, y:int, wall_bit: int) -> bool:
         if wall_bit not in DIRECTION_D:
             raise ValueError(f"Invalid wall bit: {wall_bit}")
@@ -134,27 +157,42 @@ class MazeGenerator:
             attempts += 1
 
     def display(self):
-    # 1. Print the very top boundary of the maze
-        print(" " + "___" * self.width)
+        # Print the top border, reflecting actual NORTH walls
+        top_row = " "
+        for x in range(self.width):
+            if not self.has_wall(x, 0, NORTH):
+                top_row += "   "
+            else:
+                top_row += "___"
+        print(top_row)
 
         for y in range(self.height):
-            # We start each row with the far-left wall
-            output_str = "|"
-            
+            row = ""
             for x in range(self.width):
-                # Check South wall (4) for the floor
+                # WEST wall: only print '|' if wall exists
+                if x == 0:
+                    if self.has_wall(x, y, WEST):
+                        row += "|"
+                    else:
+                        row += " "
+                # SOUTH wall: print '_' if wall exists, else space
                 if self.has_wall(x, y, SOUTH):
-                    char = "_"
+                    row += "_"
                 else:
-                    char = " "
-                    
-                # Check East wall (2) for the side
+                    row += " "
+                # EAST wall: print '|' if wall exists, else space
                 if self.has_wall(x, y, EAST):
-                    sep = "|"
+                    row += "|"
                 else:
-                    sep = " "
-                    
-                output_str += f"{char}{char}{sep}"
+                    row += " "
+            print(row)
+
+        # Print the bottom border, reflecting actual SOUTH walls
+        bottom_row = " "
+        for x in range(self.width):
+            if self.has_wall(x, self.height - 1, SOUTH):
+                bottom_row += "___"
+            else:
+                bottom_row += "   "
+        print(bottom_row)
             
-            print(output_str)
-        
