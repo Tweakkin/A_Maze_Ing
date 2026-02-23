@@ -5,4 +5,4 @@ check:
 	mypy a_maze_ing.py config_parser.py
 
 lint:
-	rm -rf __pycache__
+	rm -rf __pycache__ .mypy_cache
