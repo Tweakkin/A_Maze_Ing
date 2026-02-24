@@ -33,8 +33,8 @@ class ConfigPasrer:
             width_value = int(parsed_dict['WIDTH'])
             height_value = int(parsed_dict['HEIGHT'])
 
-            if width_value < 3 or height_value < 3:
-                print("Error: Map dimensions must be at least 3x3 (HEIGHT, WIDTH).")
+            if width_value < 9 or height_value < 7:
+                print("Error: Map dimensions must be at least 9x7 (WIDTH x HEIGHT).")
                 sys.exit(1)
         except ValueError:
             print("Error: WIDTH and HEIGHT must be integers.")
