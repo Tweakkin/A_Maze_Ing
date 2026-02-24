@@ -110,6 +110,9 @@ class MazeGenerator:
         visited = set()
         stack = []
 
+
+        if hasattr(self, 'reserved'):
+            visited.update(self.reserved)
         start = (0, 0)
 
         visited.add(start)
@@ -122,7 +125,7 @@ class MazeGenerator:
             unvisited = []
             for neighbor in neighbors:
                 nx, ny, direction = neighbor
-                if (nx, ny) not in visited:
+                if (nx, ny) not in visited and (nx, ny) not in self.reserved:
                     unvisited.append(neighbor)
             
             if unvisited:
@@ -155,6 +158,32 @@ class MazeGenerator:
                 walls_removed += 1
 
             attempts += 1
+
+    def set_42(self):
+        pattern = [
+            [1, 0, 0, 1, 0, 1, 1, 1],
+            [1, 0, 0, 1, 0, 0, 0, 1],
+            [1, 1, 1, 1, 0, 0, 1, 0],
+            [0, 0, 0, 1, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 1, 1, 1],
+        ]
+
+        p_height = len(pattern)
+        p_width = len(pattern[0])
+        # Calculate the top-left corner so the pattern is centered
+        start_x = (self.width - p_width) // 2
+        start_y = (self.height - p_height) // 2
+        # Store the reserved cells in a set for later use
+        self.reserved = set()
+        for row in range(p_height):
+            for col in range(p_width):
+                if pattern[row][col] == 1:
+                    gx = start_x + col
+                    gy = start_y + row
+                    self.reserved.add((gx, gy))
+                    # Set cell to 0 (all walls removed) so it looks like
+                    # an open block — a "room" that forms the "42"
+                    self.grid[gy][gx] = 0
 
     def display(self):
         # Print the top border, reflecting actual NORTH walls

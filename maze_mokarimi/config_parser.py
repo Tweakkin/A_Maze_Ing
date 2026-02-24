@@ -12,12 +12,16 @@ class ConfigPasrer:
         try:
             cords = coordinates.split(',')
             if len(cords) != 2:
-                raise ValueError
+                print(f"Error: Expected format of EXIT AND ENTRY 'x,y'")
+                sys.exit(1)
             x = int(cords[0])
             y = int(cords[1])
 
             if x < 0 or x >= width or y < 0 or y >= height:
                 print(f"Error: Coordinate {x},{y} is outside map dimensions ({width}x{height}).")
+                sys.exit(1)
+            if not (x == 0 or x == width - 1 or y == 0 or y == height - 1):
+                print("Error: 'ENTRY' and 'EXIT' must be on the border of the maze")
                 sys.exit(1)
         except ValueError:
             print(f"Error: Invalid coordinate '{coordinates}'. Expected integers 'x,y'.")

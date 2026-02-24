@@ -1,12 +1,12 @@
 # Basic Maze Configuration
 # ========================
 
-WIDTH=3
-HEIGHT=4
+WIDTH=20
+HEIGHT=20
 
 # Start at top-left, End at bottom-right
 ENTRY=0,0
-EXIT=1,1
+EXIT=19,19
 #yahya = 19
 # File settings
 OUTPUT_FILE=maze.txt
