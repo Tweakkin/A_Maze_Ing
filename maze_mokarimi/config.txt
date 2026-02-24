@@ -1,0 +1,16 @@
+# Basic Maze Configuration
+# ========================
+
+WIDTH=12
+HEIGHT=12
+
+# Start at top-left, End at bottom-right
+ENTRY=0,0
+EXIT=10,6
+#yahya = 19
+# File settings
+OUTPUT_FILE=maze.txt
+
+# Maze Logic
+# True = No loops, one path. False = Loops allowed.
+PERFECT=True
