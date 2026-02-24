@@ -1,8 +1,7 @@
 import sys
-from display import to_display
 from config_parser import ConfigPasrer
 from mazegenerator import MazeGenerator
-from curses import wrapper
+from display_maze import display_maze
 
 NORTH = 1
 EAST = 2
@@ -21,32 +20,11 @@ if __name__ == "__main__":
     
     try:
         gen = MazeGenerator(toparse.parsed_dict)
-        gen.set_42()            # ← FIRST: mark the 42 cells
-        gen.dfs_algo()          # ← THEN: carve maze around them
-        # gen.make_imperfect(tot) # ← imperfect also respects reserved
+        gen.set_42()
+        gen.dfs_algo()
         gen.set_entry_exit()
-        gen.display()
-        # gen = MazeGenerator(toparse.parsed_dict)
-        
-        # gen.print_grid()
-        # print("CLOSED MAZE")
-        # gen.display()
-        # print()
-        # gen.dfs_algo()
-        # gen.print_grid()
-        # print("AFTER DFS")
-        # gen.display()
+        display_maze(gen)
 
-        # if toparse.parsed_dict['PERFECT'] == False:
-        #     tot = (toparse.parsed_dict['HEIGHT'] * toparse.parsed_dict['WIDTH']) * 0.1
-        #     gen.make_imperfect(tot)
-        #     print("IMPERFECT MAZE")
-        #     gen.display()
-        # print()
-        # gen.set_entry_exit()
-        # print("ENTRY AND EXIT ACTIVATION")
-        # gen.display()
-        # wrapper(to_display, gen)
     except Exception as e:
         print(e)
         sys.exit(1)
