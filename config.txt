@@ -1,12 +1,13 @@
 
-WIDTH=20
+WIDTH=10
 HEIGHT=20
 
 # Start at top-left, End at bottom-right
 ENTRY=0,0
-EXIT=19,19
+EXIT=5,19
 
 OUTPUT_FILE=maze.txt
+SEED = 42
 
 
 PERFECT=False

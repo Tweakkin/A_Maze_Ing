@@ -92,6 +92,17 @@ class MazeGenerator:
     def print_grid(self) -> None:
         print(self.grid)
     
+
+    def get_passable_neighbors(self, x: int, y: int) -> list:
+        passable = []
+
+        for direc, (dx, dy) in DIRECTION_D.items():
+            if not (self.has_wall(x, y, direc)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < self.width and 0 <= ny < self.height:
+                    passable.append((nx, ny))
+        return passable
+
     def get_neighbors(self, x:int, y:int) -> list:
         neighbors = []
 
@@ -105,6 +116,10 @@ class MazeGenerator:
             neighbors.append((x - 1, y, WEST))
 
         return (neighbors)
+
+
+    def bfs_algo(self):
+        self.path = []
 
     def dfs_algo(self):
         visited = set()
@@ -228,4 +243,3 @@ class MazeGenerator:
             else:
                 bottom_row += "   "
         print(bottom_row)
-            
