@@ -1,8 +1,8 @@
 run:
 	python3 a_maze_ing.py config.txt
 
-check:
+lint:
 	mypy a_maze_ing.py config_parser.py
 
-lint:
+clean:
 	rm -rf __pycache__ .mypy_cache
