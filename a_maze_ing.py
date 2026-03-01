@@ -1,7 +1,8 @@
 import sys
 from config_parser import ConfigPasrer
 from mazegenerator import MazeGenerator
-from display_maze import display_maze
+from display_maze import render_maze
+from primalgo import PrimGenerator
 
 NORTH = 1
 EAST = 2
@@ -22,8 +23,15 @@ if __name__ == "__main__":
         gen = MazeGenerator(toparse.parsed_dict)
         gen.set_42()
         gen.dfs_algo()
-        gen.set_entry_exit()
-        display_maze(gen)
+        path = gen.solve_bfs(toparse.parsed_dict['ENTRY'], toparse.parsed_dict['EXIT'])
+        render_maze(gen, path)
+
+
+        gen2 = PrimGenerator(toparse.parsed_dict)
+        gen2.set_42()
+        gen2.prim_algo()
+        path = gen2.solve_bfs(toparse.parsed_dict['ENTRY'], toparse.parsed_dict['EXIT'])
+        render_maze(gen2, path)
 
     except Exception as e:
         print(e)
