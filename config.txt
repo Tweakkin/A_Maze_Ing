@@ -1,5 +1,5 @@
 
-WIDTH=10
+WIDTH=20
 HEIGHT=20
 
 # Start at top-left, End at bottom-right
