@@ -25,7 +25,7 @@ class PrimGenerator(MazeGenerator):
 
     def prim_algo(self) -> None:
         in_maze  = set()
-        reserved = getattr(self, 'reserved', set())
+        reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
 
         start_x, start_y = 0, 0
         in_maze.add((start_x, start_y))
