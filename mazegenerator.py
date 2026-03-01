@@ -1,4 +1,6 @@
 import random
+from collections import deque
+from typing import Optional
 
 NORTH = 1
 EAST = 2
@@ -41,29 +43,6 @@ class MazeGenerator:
             raise IndexError(f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
         return self.grid[y][x]
     
-    def set_entry_exit(self):
-        x_entry, y_entry = self.config['ENTRY']
-        x_exit, y_exit = self.config['EXIT']
-        
-        if y_entry == 0:
-            self.remove_wall(x_entry, y_entry, NORTH)
-        elif y_entry == self.height - 1:
-            self.remove_wall(x_entry, y_entry, SOUTH)
-        elif x_entry == 0:
-            self.remove_wall(x_entry, y_entry, WEST)
-        elif x_entry == self.width - 1:
-            self.remove_wall(x_entry, y_entry, EAST)
-        
-        if y_exit == 0:
-            self.remove_wall(x_exit, y_exit, NORTH)
-        elif y_exit == self.height - 1:
-            self.remove_wall(x_exit, y_exit, SOUTH)
-        elif x_exit == 0:
-            self.remove_wall(x_exit, y_exit, WEST)
-        elif x_exit == self.width - 1:
-            self.remove_wall(x_exit, y_exit, EAST)
-
-
     def has_wall(self, x:int, y:int, wall_bit: int) -> bool:
         if wall_bit not in DIRECTION_D:
             raise ValueError(f"Invalid wall bit: {wall_bit}")
@@ -117,11 +96,7 @@ class MazeGenerator:
 
         return (neighbors)
 
-
-    def bfs_algo(self):
-        self.path = []
-
-    def dfs_algo(self):
+    def dfs_algo(self) -> None:
         visited = set()
         stack = []
 
@@ -176,12 +151,38 @@ class MazeGenerator:
                 continue
 
             if self.has_wall(x, y, direction) and self.has_wall(nx, ny, OPPOSITE[direction]):
-                self.remove_wall(x, y, direction)
-                walls_removed += 1
+                if self.count_walls(x, y) == 3 or self.count_walls(nx, ny) == 3:
+                    self.remove_wall(x, y, direction)
+                    walls_removed += 1
 
             attempts += 1
 
-    def set_42(self):
+    def find_path(self, mapped: dict, exit: tuple[int, int]) -> list:
+        path = []
+        curr = exit
+        while curr is not None:
+            path.append(curr)
+            curr = mapped[curr]
+        return path[::-1]
+
+    def solve_bfs(self, start: tuple[int, int], exit: tuple[int, int]) -> list:
+        queue = deque([start])
+        visited = {start}
+        mapped: dict[tuple[int, int], Optional[tuple[int, int]]] = {start: None}
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) == exit:
+                return self.find_path(mapped, exit)
+            neighbors = self.get_neighbors(x, y)
+            for dx, dy, direc in neighbors:
+                if not self.has_wall(x, y, direc):
+                    if (dx, dy) not in visited:
+                        visited.add((dx, dy))
+                        mapped[(dx, dy)] = (x, y)
+                        queue.append((dx, dy))
+        return []
+
+    def set_42(self) -> None:
         pattern = [
             [1, 0, 0, 0, 1, 1, 1],
             [1, 0, 0, 0, 0, 0, 1],
@@ -200,46 +201,40 @@ class MazeGenerator:
                     gx = start_x + col
                     gy = start_y + row
                     self.reserved.add((gx, gy))
-                    self.grid[gy][gx] = 0
+                    self.grid[gy][gx] = 15
 
-    def display(self):
-        # Print the top border, reflecting actual NORTH walls
-        top_row = " "
-        for x in range(self.width):
-            if not self.has_wall(x, 0, NORTH):
-                top_row += "   "
-            else:
-                top_row += "___"
-        print(top_row)
+    def count_walls(self, x: int, y: int) -> int:
+        count = 0
+        for direction in [NORTH, SOUTH, EAST, WEST]:
+            if self.has_wall(x, y, direction):
+                count += 1
+        return count
 
-        for y in range(self.height):
-            row = ""
-            for x in range(self.width):
-                # WEST wall: only print '|' if wall exists
-                if x == 0:
-                    if self.has_wall(x, y, WEST):
-                        row += "|"
-                    else:
-                        row += " "
-                # SOUTH wall: print '_' if wall exists, else space
-                if self.has_wall(x, y, SOUTH):
-                    row += "_"
-                else:
-                    if hasattr(self, 'reserved') and (x, y) in self.reserved:
-                        row += "*"  # ← mark 42 cells visibly
-                    else:
-                        row += " "
-                if self.has_wall(x, y, EAST):
-                    row += "|"
-                else:
-                    row += " "
-            print(row)
 
-        # Print the bottom border, reflecting actual SOUTH walls
-        bottom_row = " "
-        for x in range(self.width):
-            if self.has_wall(x, self.height - 1, SOUTH):
-                bottom_row += "___"
-            else:
-                bottom_row += "   "
-        print(bottom_row)
+
+# class BfsAlgo(MazeGenerator):
+    
+#     def find_path(self, mapped, exit):
+#         path = []
+#         curr = exit
+#         while curr is not None:
+#             path.append(curr)
+#             curr = mapped[curr]
+#         return path[::-1]
+
+#     def solve_bfs(self, start, exit):
+#         queue = deque([start])
+#         visited = {start}
+#         mapped = {start: None}
+#         while queue:
+#             x, y = queue.popleft()
+#             if (x, y) == exit:
+#                 return self.find_path(mapped, exit)
+#             neighbors = self.get_neighbors(x, y)
+#             for dx, dy, direc in neighbors:
+#                 if not self.has_wall(x, y, direc):
+#                     if (dx, dy) not in visited:
+#                         visited.add((dx, dy))
+#                         mapped[(dx, dy)] = (x, y)
+#                         queue.append((dx, dy))
+#         return []
