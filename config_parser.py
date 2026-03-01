@@ -20,9 +20,9 @@ class ConfigPasrer:
             if x < 0 or x >= width or y < 0 or y >= height:
                 print(f"Error: Coordinate {x},{y} is outside map dimensions ({width}x{height}).")
                 sys.exit(1)
-            if not (x == 0 or x == width - 1 or y == 0 or y == height - 1):
-                print("Error: 'ENTRY' and 'EXIT' must be on the border of the maze")
-                sys.exit(1)
+            # if not (x == 0 or x == width - 1 or y == 0 or y == height - 1):
+            #     print("Error: 'ENTRY' and 'EXIT' must be on the border of the maze")
+            #     sys.exit(1)
         except ValueError:
             print(f"Error: Invalid coordinate '{coordinates}'. Expected integers 'x,y'.")
             sys.exit(1)
@@ -104,7 +104,7 @@ class ConfigPasrer:
                     if len(parts) != 2:
                         continue
                     #adding result to the dict
-                    parsed_dict.update({parts[0].strip() : parts[1].strip()})
+                    parsed_dict.update({parts[0].strip().upper() : parts[1].strip()})
         #handling if file was not found error
         except FileNotFoundError:
             print(f"Error: the file '{filename} was not found")
