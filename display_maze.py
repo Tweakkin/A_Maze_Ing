@@ -1,5 +1,4 @@
 import curses
-from collections import deque
 
 N, E, S, W = 1, 2, 4, 8
 DIRECTIONS = {N: (0, -1), S: (0, 1), E: (1, 0), W: (-1, 0)}
@@ -76,7 +75,7 @@ class SimpleDisplay:
                     else:
                         disp[2 * (y + 1)][2 * x + 1] = PASSAGE
 
-        # Border openings (entry / exit holes)
+        # Border openings (entry / exit holes) lbiban dyal jnab 
         for y in range(h):
             for x in range(w):
                 cell = grid[y][x]
@@ -114,7 +113,7 @@ class SimpleDisplay:
 
         return disp
 
-    def draw(self, stdscr):
+    def _init_colors(self):
         curses.curs_set(0)
         curses.start_color()
         curses.use_default_colors()
@@ -134,7 +133,7 @@ class SimpleDisplay:
         curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)     # EXIT
         curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_YELLOW)  # PATH
 
-
+    def _draw_frame(self, stdscr):
         type_to_pair = {
             WALL: 1,
             PASSAGE: 0,
@@ -155,7 +154,12 @@ class SimpleDisplay:
                     stdscr.addstr(dy, dx * 2, "  ", curses.color_pair(pair))
                 except curses.error:
                     pass
+        return rows
 
+    def draw(self, stdscr):
+        self._init_colors()
+        rows = self._draw_frame(stdscr)
+        
         try:
             stdscr.addstr(rows + 1, 0, "Press any key to quit.")
         except curses.error:
@@ -164,8 +168,66 @@ class SimpleDisplay:
         stdscr.refresh()
         stdscr.getch()
 
+    def animate_draw(self, stdscr, delay=0.2):
+        self._init_colors()
+
+        original_path = list(self.path)
+        self.path = []
+
+        rows = 0
+        for cell in original_path:
+            self.path.append(cell)
+            rows = self._draw_frame(stdscr)
+
+            stdscr.refresh()
+            curses.napms(int(delay * 1000))
+
+        try:
+            stdscr.addstr(rows + 2, 0, "Done. Press any key to quit.")
+        except curses.error:
+            pass
+
+        stdscr.refresh()
+        stdscr.getch()
 
 def render_maze(maze_gen, path):
     """Simple display — just renders the maze grid, no extras."""
     sd = SimpleDisplay(maze_gen, path)
     curses.wrapper(sd.draw)
+
+def animate_maze(maze_gen, path, delay=0.08):
+    """Animate the solution path."""
+    sd = SimpleDisplay(maze_gen, path)
+    curses.wrapper(lambda stdscr: sd.animate_draw(stdscr, delay))
+
+def draw_generation_frame(stdscr, maze_gen):
+    sd = SimpleDisplay(maze_gen, path=[])
+    sd._init_colors()
+    sd._draw_frame(stdscr)
+    stdscr.refresh()
+
+def animate_generation(maze_gen, algo="dfs", delay=20):
+    curses.wrapper(lambda stdscr: _run_generation(stdscr, maze_gen, algo, delay))
+
+
+def _run_generation(stdscr, maze_gen, algo, delay):
+    curses.curs_set(0)
+
+    if algo == "dfs":
+        maze_gen.dfs_algo(stdscr=stdscr, animate=True, delay=delay)
+    elif algo == "prim":
+        maze_gen.prim_algo(stdscr=stdscr, animate=True, delay=delay)
+    else:
+        raise ValueError("algo must be 'dfs' or 'prim'")
+
+    draw_generation_frame(stdscr, maze_gen)
+
+    try:
+        sd = SimpleDisplay(maze_gen, path=[])
+        rows = len(sd._build_display())
+        stdscr.addstr(rows + 1, 0, "Press any key to continue.")
+    except curses.error:
+        pass
+
+    stdscr.refresh()
+    stdscr.getch()

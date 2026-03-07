@@ -1,4 +1,5 @@
 import random
+import curses
 from collections import deque
 from typing import Optional
 
@@ -42,6 +43,28 @@ class MazeGenerator:
         if not (0 <= x < self.width and 0 <= y < self.height):
             raise IndexError(f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
         return self.grid[y][x]
+    #change (add)
+    def set_entry_exit(self):
+        x_entry, y_entry = self.config['ENTRY']
+        x_exit, y_exit = self.config['EXIT']
+
+        if y_entry == 0:
+            self.remove_wall(x_entry, y_entry, NORTH)
+        elif y_entry == self.height - 1:
+            self.remove_wall(x_entry, y_entry, SOUTH)
+        elif x_entry == 0:
+            self.remove_wall(x_entry, y_entry, WEST)
+        elif x_entry == self.width - 1:
+            self.remove_wall(x_entry, y_entry, EAST)
+
+        if y_exit == 0:
+            self.remove_wall(x_exit, y_exit, NORTH)
+        elif y_exit == self.height - 1:
+            self.remove_wall(x_exit, y_exit, SOUTH)
+        elif x_exit == 0:
+            self.remove_wall(x_exit, y_exit, WEST)
+        elif x_exit == self.width - 1:
+            self.remove_wall(x_exit, y_exit, EAST)
     
     def has_wall(self, x:int, y:int, wall_bit: int) -> bool:
         if wall_bit not in DIRECTION_D:
@@ -96,17 +119,34 @@ class MazeGenerator:
 
         return (neighbors)
 
-    def dfs_algo(self) -> None:
+    def dfs_algo(self, stdscr=None, animate=False, delay=20) -> None:
         visited = set()
         stack = []
 
 
-        if hasattr(self, 'reserved'):
-            visited.update(self.reserved)
+        reserved = getattr(self, 'reserved', set())
+        visited.update(reserved)
+        
         start = (0, 0)
+    #add
+        if start in reserved:
+            found = False
+            for y in range(self.height):
+                for x in range(self.width):
+                    if (x, y) not in reserved:
+                        start = (x, y)
+                        found = True
+                        break
+                if found:
+                    break
 
         visited.add(start)
         stack.append(start)
+    #add
+        if animate and stdscr is not None:
+            from display_maze import draw_generation_frame
+            draw_generation_frame(stdscr, self)
+            curses.napms(delay)
 
         while stack:
             curr_x, curr_y = stack[-1]
@@ -123,11 +163,21 @@ class MazeGenerator:
                 self.remove_wall(curr_x, curr_y, direction)
                 visited.add((nx, ny))
                 stack.append((nx, ny))
+            #add
+                if animate and stdscr is not None:
+                    from display_maze import draw_generation_frame
+                    draw_generation_frame(stdscr, self)
+                    curses.napms(delay)
             else:
                 stack.pop()
         if self.config['PERFECT'] == False:
             tot = int((self.height * self.width) * 0.1)
             self.make_imperfect(tot)
+        #add
+            if animate and stdscr is not None:
+                from display_maze import draw_generation_frame
+                draw_generation_frame(stdscr, self)
+                curses.napms(delay)
         
 
     def make_imperfect(self, extra_walls: int) -> None:

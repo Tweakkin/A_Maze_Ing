@@ -35,7 +35,7 @@ class PrimGenerator(MazeGenerator):
         while frontier:
             idx = random.randrange(len(frontier))
             frontier[idx], frontier[-1] = frontier[-1], frontier[idx]
-            from_x, from_y, to_x, to_y, direction = frontier.pop()
+            from_x, from_y, to_x, to_y, direction = frontier.pop()  
 
             if (to_x, to_y) in in_maze or (to_x, to_y) in reserved:
                 continue
