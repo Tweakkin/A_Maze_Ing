@@ -1,7 +1,7 @@
 import random
-import curses
 from collections import deque
 from typing import Optional
+from maze_animation import animate_step
 
 NORTH = 1
 EAST = 2
@@ -143,10 +143,8 @@ class MazeGenerator:
         visited.add(start)
         stack.append(start)
     #add
-        if animate and stdscr is not None:
-            from display_maze import draw_generation_frame
-            draw_generation_frame(stdscr, self)
-            curses.napms(delay)
+        if animate:
+            animate_step(stdscr, self, delay)
 
         while stack:
             curr_x, curr_y = stack[-1]
@@ -155,7 +153,7 @@ class MazeGenerator:
             unvisited = []
             for neighbor in neighbors:
                 nx, ny, direction = neighbor
-                if (nx, ny) not in visited and (nx, ny) not in self.reserved:
+                if (nx, ny) not in visited and (nx, ny) not in reserved:
                     unvisited.append(neighbor)
             
             if unvisited:
@@ -164,20 +162,16 @@ class MazeGenerator:
                 visited.add((nx, ny))
                 stack.append((nx, ny))
             #add
-                if animate and stdscr is not None:
-                    from display_maze import draw_generation_frame
-                    draw_generation_frame(stdscr, self)
-                    curses.napms(delay)
+                if animate:
+                    animate_step(stdscr, self, delay)
             else:
                 stack.pop()
         if self.config['PERFECT'] == False:
             tot = int((self.height * self.width) * 0.1)
             self.make_imperfect(tot)
         #add
-            if animate and stdscr is not None:
-                from display_maze import draw_generation_frame
-                draw_generation_frame(stdscr, self)
-                curses.napms(delay)
+            if animate:
+                animate_step(stdscr, self, delay)
         
 
     def make_imperfect(self, extra_walls: int) -> None:
@@ -185,6 +179,7 @@ class MazeGenerator:
         max_attempts = extra_walls * 100
 
         attempts = 0
+        reserved = getattr(self, 'reserved', set())
 
         while walls_removed < extra_walls and attempts < max_attempts:
             x = random.randint(0, self.width - 1)
@@ -193,10 +188,11 @@ class MazeGenerator:
             direction = random.choice([NORTH, SOUTH, EAST, WEST])
             dx, dy = DIRECTION_D[direction]
             nx, ny = x + dx, y + dy
+
             if not (0 <= nx < self.width and 0 <= ny < self.height):
                 attempts += 1
                 continue
-            if (x, y) in self.reserved or (nx, ny) in self.reserved:
+            if (x, y) in reserved or (nx, ny) in reserved:
                 attempts += 1
                 continue
 

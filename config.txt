@@ -4,7 +4,7 @@ HEIGHT=20
 
 # Start at top-left, End at bottom-right
 ENTRY=0,0
-EXIT=5,19
+EXIT=10,19
 
 OUTPUT_FILE=maze.txt
 SEED = 42

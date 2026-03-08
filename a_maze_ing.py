@@ -31,7 +31,8 @@ if __name__ == "__main__":
 
         gen2 = PrimGenerator(toparse.parsed_dict)
         gen2.set_42()
-        gen2.prim_algo()
+        animate_generation(gen2, algo="prim", delay=15)
+        # gen2.prim_algo()
         path = gen2.solve_bfs(toparse.parsed_dict['ENTRY'], toparse.parsed_dict['EXIT'])
         animate_maze(gen2, path, delay=0.08)
 
