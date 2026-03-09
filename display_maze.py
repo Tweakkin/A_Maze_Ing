@@ -16,9 +16,6 @@ EXIT_T = 4
 PATH = 5
 
 
-
-
-
 class SimpleDisplay:
     """Minimal maze renderer — walls, passages, and reserved (42) cells."""
 
