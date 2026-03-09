@@ -1,4 +1,6 @@
 import random
+import curses
+from typing import Optional
 from mazegenerator import MazeGenerator
 from maze_animation import animate_step
 
@@ -24,7 +26,7 @@ DIRECTION_D = {
 
 class PrimGenerator(MazeGenerator):
 
-    def prim_algo(self, stdscr=None, animate=False, delay=20) -> None:
+    def prim_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20) -> None:
         in_maze  = set()
         reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
 
@@ -64,7 +66,7 @@ class PrimGenerator(MazeGenerator):
                 animate_step(stdscr, self, delay)
         
         if self.config.get('PERFECT') == False:
-            tot = int((self.height * self.width) * 0.1) #10
+            tot = int((self.height * self.width) * 0.05) #10
             self.make_imperfect(tot)
 
             if animate:
