@@ -238,6 +238,8 @@ class MazeGenerator:
         ]
         p_height = len(pattern)
         p_width = len(pattern[0])
+        if self.width < p_width or self.height < p_height:
+            raise ValueError(f"Maze too small for '42' pattern. Need at least {p_width}x{p_height}.")
         start_x = (self.width - p_width) // 2
         start_y = (self.height - p_height) // 2
         self.reserved = set()
@@ -256,31 +258,3 @@ class MazeGenerator:
                 count += 1
         return count
 
-
-
-# class BfsAlgo(MazeGenerator):
-    
-#     def find_path(self, mapped, exit):
-#         path = []
-#         curr = exit
-#         while curr is not None:
-#             path.append(curr)
-#             curr = mapped[curr]
-#         return path[::-1]
-
-#     def solve_bfs(self, start, exit):
-#         queue = deque([start])
-#         visited = {start}
-#         mapped = {start: None}
-#         while queue:
-#             x, y = queue.popleft()
-#             if (x, y) == exit:
-#                 return self.find_path(mapped, exit)
-#             neighbors = self.get_neighbors(x, y)
-#             for dx, dy, direc in neighbors:
-#                 if not self.has_wall(x, y, direc):
-#                     if (dx, dy) not in visited:
-#                         visited.add((dx, dy))
-#                         mapped[(dx, dy)] = (x, y)
-#                         queue.append((dx, dy))
-#         return []

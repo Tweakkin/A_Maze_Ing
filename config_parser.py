@@ -36,6 +36,9 @@ class ConfigPasrer:
             if width_value < 9 or height_value < 7:
                 print("Error: Map dimensions must be at least 9x7 (WIDTH x HEIGHT).")
                 sys.exit(1)
+            if width_value > 200 or height_value > 200:
+                print("Error: Map dimensions must not exceed 200x200.")
+                sys.exit(1)
         except ValueError:
             print("Error: WIDTH and HEIGHT must be integers.")
             sys.exit(1)
@@ -68,6 +71,7 @@ class ConfigPasrer:
         else:
             print(f"Error: PERFECT must be 'True' or 'False'. Found '{parsed_dict['PERFECT']}'.")
             sys.exit(1)
+            return parsed_dict
 
     def val_file(self, parsed_dict: dict) -> None:
         #does it end with .txt?
@@ -107,7 +111,7 @@ class ConfigPasrer:
                     parsed_dict.update({parts[0].strip().upper() : parts[1].strip()})
         #handling if file was not found error
         except FileNotFoundError:
-            print(f"Error: the file '{filename} was not found")
+            print(f"Error: the file '{filename}' was not found")
             sys.exit(1)
         #handling permission denied error
         except PermissionError:
@@ -147,4 +151,4 @@ class ConfigPasrer:
                 sys.exit(1)
             self.bon_keys.remove('SEED')
         else:
-            self.parsed_dict = None
+            self.parsed_dict['SEED'] = None
