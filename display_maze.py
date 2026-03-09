@@ -128,7 +128,7 @@ class SimpleDisplay:
             gray = curses.COLOR_WHITE
 
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_WHITE)  # walls
-        curses.init_pair(2, gray, gray)                               # 42 cells
+        curses.init_pair(2, curses.COLOR_MAGENTA, curses.COLOR_MAGENTA)                               # 42 cells
         curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_GREEN) # ENTRY
         curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)     # EXIT
         curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_YELLOW)  # PATH
