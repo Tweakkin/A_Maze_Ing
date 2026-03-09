@@ -138,3 +138,13 @@ class ConfigPasrer:
         self.parsed_dict = self.val_bool(self.parsed_dict)
 
         self.val_file(self.parsed_dict)
+
+        if 'SEED' in self.bon_keys:
+            try:
+                self.parsed_dict['SEED'] = int(self.parsed_dict['SEED'])
+            except ValueError:
+                print(f"Error: SEED must be an integer.")
+                sys.exit(1)
+            self.bon_keys.remove('SEED')
+        else:
+            self.parsed_dict = None
