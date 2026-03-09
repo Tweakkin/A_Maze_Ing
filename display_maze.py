@@ -1,4 +1,8 @@
 import curses
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from mazegenerator import MazeGenerator
 
 N, E, S, W = 1, 2, 4, 8
 DIRECTIONS = {N: (0, -1), S: (0, 1), E: (1, 0), W: (-1, 0)}
@@ -18,12 +22,12 @@ PATH = 5
 class SimpleDisplay:
     """Minimal maze renderer — walls, passages, and reserved (42) cells."""
 
-    def __init__(self, maze_gen, path):
+    def __init__(self, maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
         self.path = path
         self.maze = maze_gen
-        self.reserved = getattr(maze_gen, 'reserved', set())
+        self.reserved: set[tuple[int, int]] = getattr(maze_gen, 'reserved', set())
 
-    def _cell_type(self, x, y):
+    def _cell_type(self, x: int, y: int) -> int:
         entry = self.maze.config['ENTRY']
         exit = self.maze.config['EXIT']
         if (x, y) == entry:
@@ -36,7 +40,7 @@ class SimpleDisplay:
             return RESERVED
         return PASSAGE
 
-    def _build_display(self):
+    def _build_display(self) -> list[list[int]]:
         """Build a (2H+1) x (2W+1) grid: WALL, PASSAGE, or RESERVED."""
         h = self.maze.height
         w = self.maze.width
@@ -113,7 +117,7 @@ class SimpleDisplay:
 
         return disp
 
-    def _init_colors(self):
+    def _init_colors(self) -> None:
         curses.curs_set(0)
         curses.start_color()
         curses.use_default_colors()
@@ -133,7 +137,7 @@ class SimpleDisplay:
         curses.init_pair(4, curses.COLOR_RED, curses.COLOR_RED)     # EXIT
         curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_YELLOW)  # PATH
 
-    def _draw_frame(self, stdscr):
+    def _draw_frame(self, stdscr: curses.window) -> int:
         type_to_pair = {
             WALL: 1,
             PASSAGE: 0,
@@ -156,7 +160,7 @@ class SimpleDisplay:
                     pass
         return rows
 
-    def draw(self, stdscr):
+    def draw(self, stdscr: curses.window) -> None:
         self._init_colors()
         rows = self._draw_frame(stdscr)
         
@@ -168,7 +172,7 @@ class SimpleDisplay:
         stdscr.refresh()
         stdscr.getch()
 
-    def animate_draw(self, stdscr, delay=0.2):
+    def animate_draw(self, stdscr: curses.window, delay: float = 0.2) -> None:
         self._init_colors()
 
         original_path = list(self.path)
@@ -190,27 +194,27 @@ class SimpleDisplay:
         stdscr.refresh()
         stdscr.getch()
 
-def render_maze(maze_gen, path):
+def render_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
     """Simple display — just renders the maze grid, no extras."""
     sd = SimpleDisplay(maze_gen, path)
     curses.wrapper(sd.draw)
 
-def animate_maze(maze_gen, path, delay=0.08):
+def animate_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]], delay: float = 0.08) -> None:
     """Animate the solution path."""
     sd = SimpleDisplay(maze_gen, path)
     curses.wrapper(lambda stdscr: sd.animate_draw(stdscr, delay))
 
-def draw_generation_frame(stdscr, maze_gen):
+def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator') -> None:
     sd = SimpleDisplay(maze_gen, path=[])
     sd._init_colors()
     sd._draw_frame(stdscr)
     stdscr.refresh()
 
-def animate_generation(maze_gen, algo="dfs", delay=20):
+def animate_generation(maze_gen: 'MazeGenerator', algo: str = "dfs", delay: int = 20) -> None:
     curses.wrapper(lambda stdscr: _run_generation(stdscr, maze_gen, algo, delay))
 
 
-def _run_generation(stdscr, maze_gen, algo, delay):
+def _run_generation(stdscr: curses.window, maze_gen: Any, algo: str, delay: int) -> None:
     curses.curs_set(0)
 
     if algo == "dfs":
