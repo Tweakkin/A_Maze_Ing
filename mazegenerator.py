@@ -1,3 +1,4 @@
+import curses
 import random
 from collections import deque
 from typing import Optional
@@ -44,27 +45,27 @@ class MazeGenerator:
             raise IndexError(f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
         return self.grid[y][x]
     #change (add)
-    def set_entry_exit(self):
-        x_entry, y_entry = self.config['ENTRY']
-        x_exit, y_exit = self.config['EXIT']
+    # def set_entry_exit(self):
+    #     x_entry, y_entry = self.config['ENTRY']
+    #     x_exit, y_exit = self.config['EXIT']
 
-        if y_entry == 0:
-            self.remove_wall(x_entry, y_entry, NORTH)
-        elif y_entry == self.height - 1:
-            self.remove_wall(x_entry, y_entry, SOUTH)
-        elif x_entry == 0:
-            self.remove_wall(x_entry, y_entry, WEST)
-        elif x_entry == self.width - 1:
-            self.remove_wall(x_entry, y_entry, EAST)
+    #     if y_entry == 0:
+    #         self.remove_wall(x_entry, y_entry, NORTH)
+    #     elif y_entry == self.height - 1:
+    #         self.remove_wall(x_entry, y_entry, SOUTH)
+    #     elif x_entry == 0:
+    #         self.remove_wall(x_entry, y_entry, WEST)
+    #     elif x_entry == self.width - 1:
+    #         self.remove_wall(x_entry, y_entry, EAST)
 
-        if y_exit == 0:
-            self.remove_wall(x_exit, y_exit, NORTH)
-        elif y_exit == self.height - 1:
-            self.remove_wall(x_exit, y_exit, SOUTH)
-        elif x_exit == 0:
-            self.remove_wall(x_exit, y_exit, WEST)
-        elif x_exit == self.width - 1:
-            self.remove_wall(x_exit, y_exit, EAST)
+    #     if y_exit == 0:
+    #         self.remove_wall(x_exit, y_exit, NORTH)
+    #     elif y_exit == self.height - 1:
+    #         self.remove_wall(x_exit, y_exit, SOUTH)
+    #     elif x_exit == 0:
+    #         self.remove_wall(x_exit, y_exit, WEST)
+    #     elif x_exit == self.width - 1:
+    #         self.remove_wall(x_exit, y_exit, EAST)
     
     def has_wall(self, x:int, y:int, wall_bit: int) -> bool:
         if wall_bit not in DIRECTION_D:
@@ -75,7 +76,8 @@ class MazeGenerator:
         
         return (self.grid[y][x] & wall_bit) != 0
     
-    def remove_wall(self, x: int, y: int, direction) -> None:
+    
+    def remove_wall(self, x: int, y: int, direction: int) -> None:
 
         if direction not in DIRECTION_D:
             raise ValueError(f"Invalid direction: {direction}, Use NORTH, SOUTH, EAST or WEST.")
@@ -95,7 +97,7 @@ class MazeGenerator:
         print(self.grid)
     
 
-    def get_passable_neighbors(self, x: int, y: int) -> list:
+    def get_passable_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         passable = []
 
         for direc, (dx, dy) in DIRECTION_D.items():
@@ -105,8 +107,8 @@ class MazeGenerator:
                     passable.append((nx, ny))
         return passable
 
-    def get_neighbors(self, x:int, y:int) -> list:
-        neighbors = []
+    def get_neighbors(self, x: int, y: int) -> list[tuple[int, int, int]]:
+        neighbors: list[tuple[int, int, int]] = []
 
         if y - 1 >= 0:
             neighbors.append((x, y - 1, NORTH))
@@ -117,14 +119,14 @@ class MazeGenerator:
         if x - 1 >= 0:
             neighbors.append((x - 1, y, WEST))
 
-        return (neighbors)
+        return neighbors
 
-    def dfs_algo(self, stdscr=None, animate=False, delay=20) -> None:
-        visited = set()
-        stack = []
+    def dfs_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20) -> None:
+        visited: set[tuple[int, int]] = set()
+        stack: list[tuple[int, int]] = []
 
 
-        reserved = getattr(self, 'reserved', set())
+        reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
         visited.update(reserved)
         
         start = (0, 0)
@@ -179,7 +181,7 @@ class MazeGenerator:
         max_attempts = extra_walls * 100
 
         attempts = 0
-        reserved = getattr(self, 'reserved', set())
+        reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
 
         while walls_removed < extra_walls and attempts < max_attempts:
             x = random.randint(0, self.width - 1)
@@ -197,13 +199,13 @@ class MazeGenerator:
                 continue
 
             if self.has_wall(x, y, direction) and self.has_wall(nx, ny, OPPOSITE[direction]):
-                if self.count_walls(x, y) == 3 or self.count_walls(nx, ny) == 3:
+                if self.count_walls(x, y) == 3 and self.count_walls(nx, ny) == 3:
                     self.remove_wall(x, y, direction)
                     walls_removed += 1
 
             attempts += 1
 
-    def find_path(self, mapped: dict, exit: tuple[int, int]) -> list:
+    def find_path(self, mapped: dict, exit: tuple[int, int]) -> list[tuple[int, int]]:
         path = []
         curr = exit
         while curr is not None:
@@ -211,7 +213,7 @@ class MazeGenerator:
             curr = mapped[curr]
         return path[::-1]
 
-    def solve_bfs(self, start: tuple[int, int], exit: tuple[int, int]) -> list:
+    def solve_bfs(self, start: tuple[int, int], exit: tuple[int, int]) -> list[tuple[int, int]]:
         queue = deque([start])
         visited = {start}
         mapped: dict[tuple[int, int], Optional[tuple[int, int]]] = {start: None}
@@ -227,6 +229,46 @@ class MazeGenerator:
                         mapped[(dx, dy)] = (x, y)
                         queue.append((dx, dy))
         return []
+    
+    def write_to_file(self, filename: str, path: list[tuple[int, int]]) -> None:
+        with open(filename, "w") as f:
+
+            # SECTION 1: Write the grid as hex
+            # Each cell value (0-15) becomes a hex character (0-F)
+            # Example: cell value 12 -> 'C', cell value 10 -> 'A'
+            for y in range(self.height):
+                row = ""
+                for x in range(self.width):
+                    row += format(self.grid[y][x], 'X')  # 'X' = uppercase hex
+                f.write(row + "\n")
+
+            # Empty line to separate sections
+            f.write("\n")
+
+            # SECTION 2: Entry and exit coordinates
+            entry = self.config['ENTRY']
+            exit = self.config['EXIT']
+            f.write(f"{entry[0]},{entry[1]}\n")
+            f.write(f"{exit[0]},{exit[1]}\n")
+
+            # SECTION 3: Path as direction letters
+            # Compare each cell with the next cell in the path
+            # to determine which direction was taken
+            directions = ""
+            for i in range(len(path) - 1):
+                cx, cy = path[i]      # current cell
+                nx, ny = path[i + 1]  # next cell
+                dx = nx - cx  # horizontal movement
+                dy = ny - cy  # vertical movement
+                if dx == 1:       # moved right
+                    directions += "E"
+                elif dx == -1:    # moved left
+                    directions += "W"
+                elif dy == 1:     # moved down
+                    directions += "S"
+                elif dy == -1:    # moved up
+                    directions += "N"
+            f.write(directions + "\n")
 
     def set_42(self) -> None:
         pattern = [

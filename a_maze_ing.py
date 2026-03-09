@@ -13,7 +13,7 @@ WEST = 8
 def main():
     if len(sys.argv) != 2:
         print("Error: Usage is python3 a_maze_ing.py <config_file>")
-        sys.exit(1)
+        sys.exit(0)
 
     toparse = ConfigPasrer(sys.argv[1])
     toparse.parse()
@@ -26,17 +26,17 @@ def main():
         gen.set_42()
         if toparse.parsed_dict['ENTRY'] in gen.reserved:
             print(f"Error: ENTRY {toparse.parsed_dict['ENTRY']} overlaps with the '42' pattern.")
-            sys.exit(1)
+            sys.exit(0)
         if toparse.parsed_dict['EXIT'] in gen.reserved:
             print(f"Error: EXIT {toparse.parsed_dict['EXIT']} overlaps with the '42' pattern.")
-            sys.exit(1)
+            sys.exit(0)
         animate_generation(gen, algo="dfs", delay=15)
         #gen.set_entry_exit()
         # gen.dfs_algo()
         path = gen.solve_bfs(toparse.parsed_dict['ENTRY'], toparse.parsed_dict['EXIT'])
         if not path:
             print("Error: No path found between ENTRY and EXIT.")
-            sys.exit(1)
+            sys.exit(0)
         animate_maze(gen, path, delay=0.08)
 
 
@@ -44,21 +44,22 @@ def main():
         gen2.set_42()
         if toparse.parsed_dict['ENTRY'] in gen2.reserved:
             print(f"Error: ENTRY {toparse.parsed_dict['ENTRY']} overlaps with the '42' pattern.")
-            sys.exit(1)
-        if toparse.parsed_dict['EXIT'] in gen.reserved:
+            sys.exit(0)
+        if toparse.parsed_dict['EXIT'] in gen2.reserved:
             print(f"Error: EXIT {toparse.parsed_dict['EXIT']} overlaps with the '42' pattern.")
-            sys.exit(1)
+            sys.exit(0)
         animate_generation(gen2, algo="prim", delay=15)
         # gen2.prim_algo()
         path = gen2.solve_bfs(toparse.parsed_dict['ENTRY'], toparse.parsed_dict['EXIT'])
         if not path:
             print("Error: No path found between ENTRY and EXIT.")
-            sys.exit(1)
+            sys.exit(0)
+        gen2.write_to_file(toparse.parsed_dict['OUTPUT_FILE'], path)
         animate_maze(gen2, path, delay=0.08)
 
     except Exception as e:
         print(e)
-        sys.exit(1)
+        sys.exit(0)
 
 if __name__ == "__main__":
     try:
