@@ -1,37 +1,35 @@
-import random
 import curses
+import random
 from typing import Optional
+
 from mazegenerator import MazeGenerator
 from maze_animation import animate_step
 
 NORTH = 1
-EAST  = 2
+EAST = 2
 SOUTH = 4
-WEST  = 8
-
-OPPOSITE = {
-    NORTH: SOUTH,
-    SOUTH: NORTH,
-    EAST:  WEST,
-    WEST:  EAST
-}
+WEST = 8
 
 DIRECTION_D = {
     NORTH: (0, -1),
-    SOUTH: (0,  1),
-    EAST:  (1,  0),
-    WEST:  (-1, 0),
+    SOUTH: (0, 1),
+    EAST: (1, 0),
+    WEST: (-1, 0),
 }
 
 
 class PrimGenerator(MazeGenerator):
-
-    def prim_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20, theme_index=0) -> None:
-        in_maze  = set()
-        reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
+    def prim_algo(
+        self,
+        stdscr: Optional[curses.window] = None,
+        animate: bool = False,
+        delay: int = 20,
+        theme_index: int = 0,
+    ) -> None:
+        in_maze = set()
+        reserved: set[tuple[int, int]] = getattr(self, "reserved", set())
 
         start_x, start_y = 0, 0
-
         if (start_x, start_y) in reserved:
             found = False
             for y in range(self.height):
@@ -51,9 +49,9 @@ class PrimGenerator(MazeGenerator):
         frontier = self._get_frontier_walls(start_x, start_y, in_maze, reserved)
 
         while frontier:
-            idx = random.randrange(len(frontier)) #return index
+            idx = random.randrange(len(frontier))  # random index
             frontier[idx], frontier[-1] = frontier[-1], frontier[idx]
-            from_x, from_y, to_x, to_y, direction = frontier.pop()  
+            from_x, from_y, to_x, to_y, direction = frontier.pop()
 
             if (to_x, to_y) in in_maze or (to_x, to_y) in reserved:
                 continue
@@ -64,9 +62,9 @@ class PrimGenerator(MazeGenerator):
 
             if animate:
                 animate_step(stdscr, self, delay, theme_index)
-        
-        if self.config.get('PERFECT') == False:
-            tot = int((self.height * self.width) * 0.05) #10
+
+        if self.config.get("PERFECT") is False:
+            tot = int((self.height * self.width) * 0.05)
             self.make_imperfect(tot)
 
             if animate:
@@ -76,10 +74,11 @@ class PrimGenerator(MazeGenerator):
         walls = []
         for direction, (dx, dy) in DIRECTION_D.items():
             nx, ny = x + dx, y + dy
-            if (0 <= nx < self.width
-                    and 0 <= ny < self.height
-                    and (nx, ny) not in in_maze
-                    and (nx, ny) not in reserved):
+            if (
+                0 <= nx < self.width
+                and 0 <= ny < self.height
+                and (nx, ny) not in in_maze
+                and (nx, ny) not in reserved
+            ):
                 walls.append((x, y, nx, ny, direction))
         return walls
-    
