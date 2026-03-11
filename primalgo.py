@@ -26,7 +26,7 @@ DIRECTION_D = {
 
 class PrimGenerator(MazeGenerator):
 
-    def prim_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20) -> None:
+    def prim_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20, theme_index=0) -> None:
         in_maze  = set()
         reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
 
@@ -46,7 +46,7 @@ class PrimGenerator(MazeGenerator):
         in_maze.add((start_x, start_y))
 
         if animate:
-            animate_step(stdscr, self, delay)
+            animate_step(stdscr, self, delay, theme_index)
 
         frontier = self._get_frontier_walls(start_x, start_y, in_maze, reserved)
 
@@ -63,14 +63,14 @@ class PrimGenerator(MazeGenerator):
             frontier.extend(self._get_frontier_walls(to_x, to_y, in_maze, reserved))
 
             if animate:
-                animate_step(stdscr, self, delay)
+                animate_step(stdscr, self, delay, theme_index)
         
         if self.config.get('PERFECT') == False:
             tot = int((self.height * self.width) * 0.05) #10
             self.make_imperfect(tot)
 
             if animate:
-                animate_step(stdscr, self, delay)
+                animate_step(stdscr, self, delay, theme_index)
 
     def _get_frontier_walls(self, x: int, y: int, in_maze: set, reserved: set) -> list:
         walls = []

@@ -121,7 +121,7 @@ class MazeGenerator:
 
         return neighbors
 
-    def dfs_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20) -> None:
+    def dfs_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20, theme_index=0) -> None:
         visited: set[tuple[int, int]] = set()
         stack: list[tuple[int, int]] = []
 
@@ -146,7 +146,7 @@ class MazeGenerator:
         stack.append(start)
     #add
         if animate:
-            animate_step(stdscr, self, delay)
+            animate_step(stdscr, self, delay, theme_index)
 
         while stack:
             curr_x, curr_y = stack[-1]
@@ -165,7 +165,7 @@ class MazeGenerator:
                 stack.append((nx, ny))
             #add
                 if animate:
-                    animate_step(stdscr, self, delay)
+                    animate_step(stdscr, self, delay, theme_index)
             else:
                 stack.pop()
         if self.config['PERFECT'] == False:
@@ -173,7 +173,7 @@ class MazeGenerator:
             self.make_imperfect(tot)
         #add
             if animate:
-                animate_step(stdscr, self, delay)
+                animate_step(stdscr, self, delay, theme_index)
         
 
     def make_imperfect(self, extra_walls: int) -> None:

@@ -1,17 +1,17 @@
 import curses
-from display_maze import SimpleDisplay
+from display_maze import SimpleDisplay, draw_generation_frame
 
 
-def draw_generation_frame(stdscr, maze_gen):
-    sd = SimpleDisplay(maze_gen, path=[])
-    sd._init_colors()
-    sd._draw_frame(stdscr)
-    stdscr.refresh()
+# def draw_generation_frame(stdscr, maze_gen):
+#     sd = SimpleDisplay(maze_gen, path=[])
+#     sd._init_colors()
+#     sd._draw_frame(stdscr)
+#     stdscr.refresh()
 
 
-def animate_step(stdscr, maze_gen, delay=20):
+def animate_step(stdscr, maze_gen, delay=20, theme_index=0):
     if stdscr is not None:
-        draw_generation_frame(stdscr, maze_gen)
+        draw_generation_frame(stdscr, maze_gen, theme_index)
         curses.napms(delay)
 
 

@@ -2,7 +2,7 @@ import sys
 import random
 from config_parser import ConfigPasrer
 from mazegenerator import MazeGenerator
-from display_maze import render_maze, animate_maze, animate_generation
+from display_maze import render_maze, animate_maze, animate_generation, simple_menu_maze
 from primalgo import PrimGenerator
 
 NORTH = 1
@@ -37,7 +37,7 @@ def main():
         if not path:
             print("Error: No path found between ENTRY and EXIT.")
             sys.exit(0)
-        animate_maze(gen, path, delay=0.08)
+        simple_menu_maze(gen, path, algo="dfs")
 
 
         gen2 = PrimGenerator(toparse.parsed_dict)
