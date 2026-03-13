@@ -1,5 +1,5 @@
 import curses
-from display_maze import SimpleDisplay, draw_generation_frame
+from mazegenerator.display_maze import SimpleDisplay, draw_generation_frame
 
 
 def animate_step(stdscr, maze_gen, delay=20, theme_index=0):
@@ -9,7 +9,8 @@ def animate_step(stdscr, maze_gen, delay=20, theme_index=0):
 
 
 def animate_generation(maze_gen, algo="dfs", delay=20):
-    curses.wrapper(lambda stdscr: _run_generation(stdscr, maze_gen, algo, delay))
+    curses.wrapper(lambda stdscr: _run_generation(
+        stdscr, maze_gen, algo, delay))
 
 
 def _run_generation(stdscr, maze_gen, algo, delay):

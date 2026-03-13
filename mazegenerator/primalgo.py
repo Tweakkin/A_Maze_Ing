@@ -3,7 +3,7 @@ import random
 from typing import Optional
 
 from mazegenerator import MazeGenerator
-from maze_animation import animate_step
+from mazegenerator.maze_animation import animate_step
 
 NORTH = 1
 EAST = 2
@@ -46,7 +46,8 @@ class PrimGenerator(MazeGenerator):
         if animate:
             animate_step(stdscr, self, delay, theme_index)
 
-        frontier = self._get_frontier_walls(start_x, start_y, in_maze, reserved)
+        frontier = self._get_frontier_walls(
+            start_x, start_y, in_maze, reserved)
 
         while frontier:
             idx = random.randrange(len(frontier))  # random index
@@ -58,7 +59,8 @@ class PrimGenerator(MazeGenerator):
 
             self.remove_wall(from_x, from_y, direction)
             in_maze.add((to_x, to_y))
-            frontier.extend(self._get_frontier_walls(to_x, to_y, in_maze, reserved))
+            frontier.extend(self._get_frontier_walls(
+                to_x, to_y, in_maze, reserved))
 
             if animate:
                 animate_step(stdscr, self, delay, theme_index)

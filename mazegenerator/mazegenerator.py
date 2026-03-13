@@ -2,7 +2,7 @@ import curses
 import random
 from collections import deque
 from typing import Optional
-from maze_animation import animate_step
+from mazegenerator.maze_animation import animate_step
 
 NORTH = 1
 EAST = 2
@@ -23,6 +23,7 @@ DIRECTION_D = {
     WEST: (-1, 0)
 }
 
+
 class MazeGenerator:
 
     def __init__(self, parsed_dict: dict) -> None:
@@ -39,12 +40,13 @@ class MazeGenerator:
             for _ in range(self.width):
                 temp.append(15)
             self.grid.append(temp)
-    
-    def get_cell(self, x:int, y:int) -> int:
+
+    def get_cell(self, x: int, y: int) -> int:
         if not (0 <= x < self.width and 0 <= y < self.height):
-            raise IndexError(f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
+            raise IndexError(
+                f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
         return self.grid[y][x]
-    #change (add)
+    # change (add)
     # def set_entry_exit(self):
     #     x_entry, y_entry = self.config['ENTRY']
     #     x_exit, y_exit = self.config['EXIT']
@@ -66,25 +68,25 @@ class MazeGenerator:
     #         self.remove_wall(x_exit, y_exit, WEST)
     #     elif x_exit == self.width - 1:
     #         self.remove_wall(x_exit, y_exit, EAST)
-    
-    def has_wall(self, x:int, y:int, wall_bit: int) -> bool:
+
+    def has_wall(self, x: int, y: int, wall_bit: int) -> bool:
         if wall_bit not in DIRECTION_D:
             raise ValueError(f"Invalid wall bit: {wall_bit}")
 
-        if not(0 <= x < self.width and 0 <= y < self.height):
+        if not (0 <= x < self.width and 0 <= y < self.height):
             return False
-        
+
         return (self.grid[y][x] & wall_bit) != 0
-    
-    
+
     def remove_wall(self, x: int, y: int, direction: int) -> None:
 
         if direction not in DIRECTION_D:
-            raise ValueError(f"Invalid direction: {direction}, Use NORTH, SOUTH, EAST or WEST.")
-        
+            raise ValueError(
+                f"Invalid direction: {direction}, Use NORTH, SOUTH, EAST or WEST.")
+
         if not (0 <= x < self.width and 0 <= y < self.height):
             return
-        
+
         self.grid[y][x] = self.grid[y][x] & ~direction
 
         dx, dy = DIRECTION_D[direction]
@@ -95,7 +97,6 @@ class MazeGenerator:
 
     def print_grid(self) -> None:
         print(self.grid)
-    
 
     def get_passable_neighbors(self, x: int, y: int) -> list[tuple[int, int]]:
         passable = []
@@ -125,12 +126,11 @@ class MazeGenerator:
         visited: set[tuple[int, int]] = set()
         stack: list[tuple[int, int]] = []
 
-
         reserved: set[tuple[int, int]] = getattr(self, 'reserved', set())
         visited.update(reserved)
-        
+
         start = (0, 0)
-    #add
+    # add
         if start in reserved:
             found = False
             for y in range(self.height):
@@ -144,26 +144,26 @@ class MazeGenerator:
 
         visited.add(start)
         stack.append(start)
-    #add
+    # add
         if animate:
             animate_step(stdscr, self, delay, theme_index)
 
         while stack:
             curr_x, curr_y = stack[-1]
             neighbors = self.get_neighbors(curr_x, curr_y)
-        
+
             unvisited = []
             for neighbor in neighbors:
                 nx, ny, direction = neighbor
                 if (nx, ny) not in visited and (nx, ny) not in reserved:
                     unvisited.append(neighbor)
-            
+
             if unvisited:
                 nx, ny, direction = random.choice(unvisited)
                 self.remove_wall(curr_x, curr_y, direction)
                 visited.add((nx, ny))
                 stack.append((nx, ny))
-            #add
+            # add
                 if animate:
                     animate_step(stdscr, self, delay, theme_index)
             else:
@@ -171,10 +171,9 @@ class MazeGenerator:
         if self.config['PERFECT'] == False:
             tot = int((self.height * self.width) * 0.1)
             self.make_imperfect(tot)
-        #add
+        # add
             if animate:
                 animate_step(stdscr, self, delay, theme_index)
-        
 
     def make_imperfect(self, extra_walls: int) -> None:
         walls_removed = 0
@@ -216,7 +215,8 @@ class MazeGenerator:
     def solve_bfs(self, start: tuple[int, int], exit: tuple[int, int]) -> list[tuple[int, int]]:
         queue = deque([start])
         visited = {start}
-        mapped: dict[tuple[int, int], Optional[tuple[int, int]]] = {start: None}
+        mapped: dict[tuple[int, int],
+                     Optional[tuple[int, int]]] = {start: None}
         while queue:
             x, y = queue.popleft()
             if (x, y) == exit:
@@ -229,7 +229,7 @@ class MazeGenerator:
                         mapped[(dx, dy)] = (x, y)
                         queue.append((dx, dy))
         return []
-    
+
     def write_to_file(self, filename: str, path: list[tuple[int, int]]) -> None:
         with open(filename, "w") as f:
 
@@ -281,7 +281,8 @@ class MazeGenerator:
         p_height = len(pattern)
         p_width = len(pattern[0])
         if self.width < p_width or self.height < p_height:
-            raise ValueError(f"Maze too small for '42' pattern. Need at least {p_width}x{p_height}.")
+            raise ValueError(
+                f"Maze too small for '42' pattern. Need at least {p_width}x{p_height}.")
         start_x = (self.width - p_width) // 2
         start_y = (self.height - p_height) // 2
         self.reserved = set()
@@ -299,4 +300,3 @@ class MazeGenerator:
             if self.has_wall(x, y, direction):
                 count += 1
         return count
-

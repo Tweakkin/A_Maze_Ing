@@ -28,8 +28,9 @@ class SimpleDisplay:
     def __init__(self, maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
         self.path = path
         self.maze = maze_gen
-        self.reserved: set[tuple[int, int]] = getattr(maze_gen, 'reserved', set())
-        self.theme_index = 0 #them dyal lcolors
+        self.reserved: set[tuple[int, int]] = getattr(
+            maze_gen, 'reserved', set())
+        self.theme_index = 0  # them dyal lcolors
 
     def _cell_type(self, x: int, y: int) -> int:
         entry = self.maze.config['ENTRY']
@@ -48,11 +49,11 @@ class SimpleDisplay:
         """Build a (2H+1) x (2W+1) grid: WALL, PASSAGE, or RESERVED."""
         h = self.maze.height
         w = self.maze.width
-        grid = self.maze.grid #data of maze
+        grid = self.maze.grid  # data of maze
         rows = 2 * h + 1
         cols = 2 * w + 1
 
-        disp = [[WALL] * cols for _ in range(rows)] #matrix of walls
+        disp = [[WALL] * cols for _ in range(rows)]  # matrix of walls
 
         # Cell interiors
         for y in range(h):
@@ -64,7 +65,7 @@ class SimpleDisplay:
         for y in range(h):
             for x in range(w):
                 cell = grid[y][x]
-                if x + 1 < w and not (cell & E): #jiha dyal liman
+                if x + 1 < w and not (cell & E):  # jiha dyal liman
                     t1 = self._cell_type(x, y)
                     t2 = self._cell_type(x + 1, y)
                     if t1 == RESERVED and t2 == RESERVED:
@@ -73,7 +74,7 @@ class SimpleDisplay:
                         disp[2 * y + 1][2 * (x + 1)] = PATH
                     else:
                         disp[2 * y + 1][2 * (x + 1)] = PASSAGE
-                if y + 1 < h and not (cell & S): #jiha dyal ltaht
+                if y + 1 < h and not (cell & S):  # jiha dyal ltaht
                     t1 = self._cell_type(x, y)
                     t2 = self._cell_type(x, y + 1)
                     if t1 == RESERVED and t2 == RESERVED:
@@ -83,12 +84,12 @@ class SimpleDisplay:
                     else:
                         disp[2 * (y + 1)][2 * x + 1] = PASSAGE
 
-        # Border openings (entry / exit holes) lbiban dyal jnab 
+        # Border openings (entry / exit holes) lbiban dyal jnab
         for y in range(h):
             for x in range(w):
                 cell = grid[y][x]
                 ct = self._cell_type(x, y)
-                if y == 0 and not (cell & N):   
+                if y == 0 and not (cell & N):
                     disp[0][2 * x + 1] = ct
                 if y == h - 1 and not (cell & S):
                     disp[2 * h][2 * x + 1] = ct
@@ -127,12 +128,16 @@ class SimpleDisplay:
         curses.use_default_colors()
 
         themes = [
-            (curses.COLOR_WHITE, curses.COLOR_MAGENTA, curses.COLOR_GREEN, curses.COLOR_RED, curses.COLOR_YELLOW),
-            (curses.COLOR_CYAN, curses.COLOR_BLUE, curses.COLOR_GREEN, curses.COLOR_RED, curses.COLOR_WHITE),
-            (curses.COLOR_YELLOW, curses.COLOR_MAGENTA, curses.COLOR_CYAN, curses.COLOR_RED, curses.COLOR_GREEN),
+            (curses.COLOR_WHITE, curses.COLOR_MAGENTA,
+             curses.COLOR_GREEN, curses.COLOR_RED, curses.COLOR_YELLOW),
+            (curses.COLOR_CYAN, curses.COLOR_BLUE, curses.COLOR_GREEN,
+             curses.COLOR_RED, curses.COLOR_WHITE),
+            (curses.COLOR_YELLOW, curses.COLOR_MAGENTA,
+             curses.COLOR_CYAN, curses.COLOR_RED, curses.COLOR_GREEN),
         ]
 
-        wall_c, reserved_c, entry_c, exit_c, path_c = themes[self.theme_index % len(themes)]
+        wall_c, reserved_c, entry_c, exit_c, path_c = themes[self.theme_index % len(
+            themes)]
 
         curses.init_pair(1, wall_c, wall_c)          # walls
         curses.init_pair(2, reserved_c, reserved_c)  # 42
@@ -166,7 +171,7 @@ class SimpleDisplay:
     def draw(self, stdscr: curses.window) -> None:
         self._init_colors()
         rows = self._draw_frame(stdscr)
-        
+
         try:
             stdscr.addstr(rows + 1, 0, "Press any key to quit.")
         except curses.error:
@@ -208,10 +213,12 @@ def render_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
     sd = SimpleDisplay(maze_gen, path)
     curses.wrapper(sd.draw)
 
+
 def animate_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]], delay: float = 0.08) -> None:
     """Animate the solution path."""
     sd = SimpleDisplay(maze_gen, path)
     curses.wrapper(lambda stdscr: sd.animate_draw(stdscr, delay))
+
 
 def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator', theme_index: int = 0) -> None:
     sd = SimpleDisplay(maze_gen, path=[])
@@ -224,8 +231,10 @@ def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator', them
         pass
     stdscr.refresh()
 
+
 def animate_generation(maze_gen: 'MazeGenerator', algo: str = "dfs", delay: int = 20) -> None:
-    curses.wrapper(lambda stdscr: _run_generation(stdscr, maze_gen, algo, delay))
+    curses.wrapper(lambda stdscr: _run_generation(
+        stdscr, maze_gen, algo, delay))
 
 
 def _run_generation(stdscr: curses.window, maze_gen: Any, algo: str, delay: int) -> None:
@@ -243,8 +252,10 @@ def _run_generation(stdscr: curses.window, maze_gen: Any, algo: str, delay: int)
     stdscr.refresh()
     stdscr.getch()
 
+
 def simple_menu_maze(maze_gen, path, algo="dfs", gen_delay=15):
-    curses.wrapper(lambda stdscr: _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay))
+    curses.wrapper(lambda stdscr: _simple_menu_loop(
+        stdscr, maze_gen, path, algo, gen_delay))
 
 
 def _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay):
@@ -297,13 +308,16 @@ def _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay):
 
             # generate with animation
             if algo == "prim" and hasattr(new_gen, "prim_algo"):
-                new_gen.prim_algo(stdscr=stdscr, animate=True, delay=gen_delay, theme_index=theme_index)
+                new_gen.prim_algo(stdscr=stdscr, animate=True,
+                                  delay=gen_delay, theme_index=theme_index)
             elif algo == "dfs" and hasattr(new_gen, "dfs_algo"):
-                new_gen.dfs_algo(stdscr=stdscr, animate=True, delay=gen_delay, theme_index=theme_index)
+                new_gen.dfs_algo(stdscr=stdscr, animate=True,
+                                 delay=gen_delay, theme_index=theme_index)
             else:
                 raise ValueError("Invalid algorithm choice.")
 
-            full_path = new_gen.solve_bfs(new_gen.config['ENTRY'], new_gen.config['EXIT'])
+            full_path = new_gen.solve_bfs(
+                new_gen.config['ENTRY'], new_gen.config['EXIT'])
             maze_gen = new_gen
             show_path = True
 
