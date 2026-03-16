@@ -24,7 +24,7 @@ def main():
         random.seed(toparse.parsed_dict['SEED'])
 
     try:
-        algo = toparse.parsed_dict['ALGORITHM']
+        algo = toparse.parsed_dict['ALGO']
         gen_class = MazeGenerator if algo == "dfs" else PrimGenerator
         gen = gen_class(toparse.parsed_dict)
         gen.set_42()

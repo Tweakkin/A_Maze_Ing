@@ -51,7 +51,7 @@ class ConfigPasrer:
 
     def val_keys(self, parsed_dict: dict) -> list[str]:
         allowed_keys = ['WIDTH', 'HEIGHT', 'ENTRY',
-                        'EXIT', 'OUTPUT_FILE', 'PERFECT', 'ALGORITHM']
+                        'EXIT', 'OUTPUT_FILE', 'PERFECT', 'ALGO']
         mandatory_keys = ['WIDTH', 'HEIGHT', 'ENTRY',
                           'EXIT', 'OUTPUT_FILE', 'PERFECT']
         bonus_keys = []
@@ -66,15 +66,15 @@ class ConfigPasrer:
                 sys.exit(0)
         return bonus_keys
 
-    def val_algorithm(self, parsed_dict: dict) -> dict:
-        algo = parsed_dict.get('ALGORITHM', 'dfs')
+    def val_algo(self, parsed_dict: dict) -> dict:
+        algo = parsed_dict.get('ALGO', 'dfs')
         algo = str(algo).strip().lower()
 
         if algo not in ('dfs', 'prim'):
-            print(f"Error: ALGORITHM must be 'dfs' or 'prim'. Found '{algo}'.")
+            print(f"Error: ALGO must be 'dfs' or 'prim'. Found '{algo}'.")
             sys.exit(0)
 
-        parsed_dict['ALGORITHM'] = algo
+        parsed_dict['ALGO'] = algo
         return parsed_dict
 
     def val_bool(self, parsed_dict: dict) -> dict:
@@ -167,7 +167,7 @@ class ConfigPasrer:
             sys.exit(0)
 
         self.parsed_dict = self.val_bool(self.parsed_dict)
-        self.parsed_dict = self.val_algorithm(self.parsed_dict)
+        self.parsed_dict = self.val_algo(self.parsed_dict)
 
         self.val_file(self.parsed_dict)
 

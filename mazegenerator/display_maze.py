@@ -206,19 +206,7 @@ class SimpleDisplay:
 def _draw_menu(stdscr: curses.window, start_row: int) -> None:
     for i, line in enumerate(MENU_LINES):
         stdscr.addstr(start_row + i, 0, line)
-
-
-def render_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
-    """Simple display — just renders the maze grid, no extras."""
-    sd = SimpleDisplay(maze_gen, path)
-    curses.wrapper(sd.draw)
-
-
-def animate_maze(maze_gen: 'MazeGenerator', path: list[tuple[int, int]], delay: float = 0.08) -> None:
-    """Animate the solution path."""
-    sd = SimpleDisplay(maze_gen, path)
-    curses.wrapper(lambda stdscr: sd.animate_draw(stdscr, delay))
-
+		
 
 def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator', theme_index: int = 0) -> None:
     sd = SimpleDisplay(maze_gen, path=[])

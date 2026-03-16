@@ -12,3 +12,4 @@ OUTPUT_FILE=maze.txt
 
 PERFECT=False
 seed=45
+algo=prim

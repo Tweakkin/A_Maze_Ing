@@ -32,6 +32,8 @@ class MazeGenerator:
         if not isinstance(parsed_dict['HEIGHT'], int) or parsed_dict['HEIGHT'] <= 0:
             raise ValueError('height must be a positive integer!')
         self.config = parsed_dict
+        if self.config.get('SEED') is not None:
+            random.seed(self.config['SEED'])
         self.width = parsed_dict['WIDTH']
         self.height = parsed_dict['HEIGHT']
         self.grid = []
