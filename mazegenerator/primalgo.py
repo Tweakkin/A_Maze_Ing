@@ -19,6 +19,9 @@ DIRECTION_D = {
 
 
 class PrimGenerator(MazeGenerator):
+    """Maze generator that carves passages
+    using randomized Prim's algorithm."""
+
     def prim_algo(
         self,
         stdscr: Optional[curses.window] = None,
@@ -26,6 +29,7 @@ class PrimGenerator(MazeGenerator):
         delay: int = 20,
         theme_index: int = 0,
     ) -> None:
+        # Expand the maze from a start cell by opening random frontier walls.
         in_maze = set()
         reserved: set[tuple[int, int]] = getattr(self, "reserved", set())
 
@@ -72,7 +76,10 @@ class PrimGenerator(MazeGenerator):
             if animate:
                 animate_step(stdscr, self, delay, theme_index)
 
-    def _get_frontier_walls(self, x: int, y: int, in_maze: set, reserved: set) -> list:
+    def _get_frontier_walls(
+        self, x: int, y: int, in_maze: set, reserved: set
+    ) -> list:
+        # Return neighbor walls that can connect the current maze to new cells.
         walls = []
         for direction, (dx, dy) in DIRECTION_D.items():
             nx, ny = x + dx, y + dy

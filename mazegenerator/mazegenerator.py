@@ -27,9 +27,15 @@ DIRECTION_D = {
 class MazeGenerator:
 
     def __init__(self, parsed_dict: dict) -> None:
-        if not isinstance(parsed_dict['WIDTH'], int) or parsed_dict['WIDTH'] <= 0:
+        if (
+            not isinstance(parsed_dict['WIDTH'], int)
+            or parsed_dict['WIDTH'] <= 0
+        ):
             raise ValueError('width must be a positive integer!')
-        if not isinstance(parsed_dict['HEIGHT'], int) or parsed_dict['HEIGHT'] <= 0:
+        if (
+            not isinstance(parsed_dict['HEIGHT'], int)
+            or parsed_dict['HEIGHT'] <= 0
+        ):
             raise ValueError('height must be a positive integer!')
         self.config = parsed_dict
         if self.config.get('SEED') is not None:
@@ -46,7 +52,11 @@ class MazeGenerator:
     def get_cell(self, x: int, y: int) -> int:
         if not (0 <= x < self.width and 0 <= y < self.height):
             raise IndexError(
-                f"Cell ({x}, {y}) is out of bounds for {self.width}x{self.height} grid.")
+                (
+                    f"Cell ({x}, {y}) is out of bounds for "
+                    f"{self.width}x{self.height} grid."
+                )
+            )
         return self.grid[y][x]
     # change (add)
     # def set_entry_exit(self):
@@ -84,7 +94,11 @@ class MazeGenerator:
 
         if direction not in DIRECTION_D:
             raise ValueError(
-                f"Invalid direction: {direction}, Use NORTH, SOUTH, EAST or WEST.")
+                (
+                    f"Invalid direction: {direction}, Use NORTH, "
+                    "SOUTH, EAST or WEST."
+                )
+            )
 
         if not (0 <= x < self.width and 0 <= y < self.height):
             return
@@ -124,7 +138,13 @@ class MazeGenerator:
 
         return neighbors
 
-    def dfs_algo(self, stdscr: Optional[curses.window] = None, animate: bool = False, delay: int = 20, theme_index=0) -> None:
+    def dfs_algo(
+        self,
+        stdscr: Optional[curses.window] = None,
+        animate: bool = False,
+        delay: int = 20,
+        theme_index=0,
+    ) -> None:
         visited: set[tuple[int, int]] = set()
         stack: list[tuple[int, int]] = []
 
@@ -170,7 +190,7 @@ class MazeGenerator:
                     animate_step(stdscr, self, delay, theme_index)
             else:
                 stack.pop()
-        if self.config['PERFECT'] == False:
+        if self.config['PERFECT'] is False:
             tot = int((self.height * self.width) * 0.1)
             self.make_imperfect(tot)
         # add
@@ -199,14 +219,21 @@ class MazeGenerator:
                 attempts += 1
                 continue
 
-            if self.has_wall(x, y, direction) and self.has_wall(nx, ny, OPPOSITE[direction]):
-                if self.count_walls(x, y) == 3 and self.count_walls(nx, ny) == 3:
+            if self.has_wall(x, y, direction) and self.has_wall(
+                nx, ny, OPPOSITE[direction]
+            ):
+                if (
+                    self.count_walls(x, y) == 3
+                    and self.count_walls(nx, ny) == 3
+                ):
                     self.remove_wall(x, y, direction)
                     walls_removed += 1
 
             attempts += 1
 
-    def find_path(self, mapped: dict, exit: tuple[int, int]) -> list[tuple[int, int]]:
+    def find_path(
+        self, mapped: dict, exit: tuple[int, int]
+    ) -> list[tuple[int, int]]:
         path = []
         curr = exit
         while curr is not None:
@@ -214,7 +241,9 @@ class MazeGenerator:
             curr = mapped[curr]
         return path[::-1]
 
-    def solve_bfs(self, start: tuple[int, int], exit: tuple[int, int]) -> list[tuple[int, int]]:
+    def solve_bfs(
+        self, start: tuple[int, int], exit: tuple[int, int]
+    ) -> list[tuple[int, int]]:
         queue = deque([start])
         visited = {start}
         mapped: dict[tuple[int, int],
@@ -232,7 +261,9 @@ class MazeGenerator:
                         queue.append((dx, dy))
         return []
 
-    def write_to_file(self, filename: str, path: list[tuple[int, int]]) -> None:
+    def write_to_file(
+        self, filename: str, path: list[tuple[int, int]]
+    ) -> None:
         with open(filename, "w") as f:
 
             # SECTION 1: Write the grid as hex
@@ -284,7 +315,11 @@ class MazeGenerator:
         p_width = len(pattern[0])
         if self.width < p_width or self.height < p_height:
             raise ValueError(
-                f"Maze too small for '42' pattern. Need at least {p_width}x{p_height}.")
+                (
+                    "Maze too small for '42' pattern. "
+                    f"Need at least {p_width}x{p_height}."
+                )
+            )
         start_x = (self.width - p_width) // 2
         start_y = (self.height - p_height) // 2
         self.reserved = set()

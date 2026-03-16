@@ -25,7 +25,10 @@ MENU_LINES = [
 class SimpleDisplay:
     """Minimal maze renderer — walls, passages, and reserved (42) cells."""
 
-    def __init__(self, maze_gen: 'MazeGenerator', path: list[tuple[int, int]]) -> None:
+    def __init__(
+        self, maze_gen: 'MazeGenerator', path: list[tuple[int, int]]
+    ) -> None:
+        # Store the maze data, solved path, and current color theme state.
         self.path = path
         self.maze = maze_gen
         self.reserved: set[tuple[int, int]] = getattr(
@@ -33,6 +36,7 @@ class SimpleDisplay:
         self.theme_index = 0  # them dyal lcolors
 
     def _cell_type(self, x: int, y: int) -> int:
+        # Determine the visual type for a single maze cell.
         entry = self.maze.config['ENTRY']
         exit = self.maze.config['EXIT']
         if (x, y) == entry:
@@ -123,6 +127,7 @@ class SimpleDisplay:
         return disp
 
     def _init_colors(self) -> None:
+        # Initialize curses colors for the currently selected theme.
         curses.curs_set(0)
         curses.start_color()
         curses.use_default_colors()
@@ -136,8 +141,9 @@ class SimpleDisplay:
              curses.COLOR_CYAN, curses.COLOR_RED, curses.COLOR_GREEN),
         ]
 
-        wall_c, reserved_c, entry_c, exit_c, path_c = themes[self.theme_index % len(
-            themes)]
+        wall_c, reserved_c, entry_c, exit_c, path_c = themes[
+            self.theme_index % len(themes)
+        ]
 
         curses.init_pair(1, wall_c, wall_c)          # walls
         curses.init_pair(2, reserved_c, reserved_c)  # 42
@@ -146,6 +152,7 @@ class SimpleDisplay:
         curses.init_pair(5, path_c, path_c)          # path
 
     def _draw_frame(self, stdscr: curses.window) -> int:
+        # Render the maze on screen and return the number of drawn rows.
         type_to_pair = {
             WALL: 1,
             PASSAGE: 0,
@@ -169,6 +176,7 @@ class SimpleDisplay:
         return rows
 
     def draw(self, stdscr: curses.window) -> None:
+        # Draw the full maze once and wait for the user to press a key.
         self._init_colors()
         rows = self._draw_frame(stdscr)
 
@@ -181,6 +189,7 @@ class SimpleDisplay:
         stdscr.getch()
 
     def animate_draw(self, stdscr: curses.window, delay: float = 0.2) -> None:
+        # Reveal the solution path progressively before showing the menu.
         self._init_colors()
 
         original_path = list(self.path)
@@ -204,11 +213,16 @@ class SimpleDisplay:
 
 
 def _draw_menu(stdscr: curses.window, start_row: int) -> None:
+    # Display the available keyboard actions under the maze.
     for i, line in enumerate(MENU_LINES):
         stdscr.addstr(start_row + i, 0, line)
-		
 
-def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator', theme_index: int = 0) -> None:
+def draw_generation_frame(
+    stdscr: curses.window,
+    maze_gen: 'MazeGenerator',
+    theme_index: int = 0,
+) -> None:
+    # Draw one frame of the maze generation process.
     sd = SimpleDisplay(maze_gen, path=[])
     sd.theme_index = theme_index
     sd._init_colors()
@@ -220,12 +234,18 @@ def draw_generation_frame(stdscr: curses.window, maze_gen: 'MazeGenerator', them
     stdscr.refresh()
 
 
-def animate_generation(maze_gen: 'MazeGenerator', algo: str = "dfs", delay: int = 20) -> None:
+def animate_generation(
+    maze_gen: 'MazeGenerator', algo: str = "dfs", delay: int = 20
+) -> None:
+    # Launch a curses session that animates the selected generator.
     curses.wrapper(lambda stdscr: _run_generation(
         stdscr, maze_gen, algo, delay))
 
 
-def _run_generation(stdscr: curses.window, maze_gen: Any, algo: str, delay: int) -> None:
+def _run_generation(
+    stdscr: curses.window, maze_gen: Any, algo: str, delay: int
+) -> None:
+    # Run the chosen algorithm, then keep the generated maze visible.
     curses.curs_set(0)
 
     if algo == "dfs":
@@ -242,11 +262,14 @@ def _run_generation(stdscr: curses.window, maze_gen: Any, algo: str, delay: int)
 
 
 def simple_menu_maze(maze_gen, path, algo="dfs", gen_delay=15):
+    # Start the interactive maze viewer with its control menu.
     curses.wrapper(lambda stdscr: _simple_menu_loop(
         stdscr, maze_gen, path, algo, gen_delay))
 
 
 def _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay):
+    # Process menu inputs for regeneration, path toggle, theme changes,
+    # and exit.
     curses.curs_set(0)
 
     full_path = path
@@ -309,7 +332,8 @@ def _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay):
             maze_gen = new_gen
             show_path = True
 
-            # Same behavior as first run: animate solved path after regeneration
+            # Same behavior as first run: animate solved path
+            # after regeneration.
             shown_path = []
             for cell in full_path:
                 shown_path.append(cell)

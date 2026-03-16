@@ -9,7 +9,9 @@ class ConfigPasrer:
         self.parsed_dict: dict[str, Any] = {}
         self.bon_keys: list[str] = []
 
-    def parse_coordinate(self, coordinates: str, height: int, width: int) -> tuple[int, int]:
+    def parse_coordinate(
+        self, coordinates: str, height: int, width: int
+    ) -> tuple[int, int]:
         try:
             cords = coordinates.split(',')
             if len(cords) != 2:
@@ -20,14 +22,25 @@ class ConfigPasrer:
 
             if x < 0 or x >= width or y < 0 or y >= height:
                 print(
-                    f"Error: Coordinate {x},{y} is outside map dimensions ({width}x{height}).")
+                    (
+                        f"Error: Coordinate {x},{y} is outside map "
+                        f"dimensions ({width}x{height})."
+                    )
+                )
                 sys.exit(0)
             # if not (x == 0 or x == width - 1 or y == 0 or y == height - 1):
-            #     print("Error: 'ENTRY' and 'EXIT' must be on the border of the maze")
+            #     print(
+            #         "Error: 'ENTRY' and 'EXIT' must be on the border of "
+            #         "the maze"
+            #     )
             #     sys.exit(0)
         except ValueError:
             print(
-                f"Error: Invalid coordinate '{coordinates}'. Expected integers 'x,y'.")
+                (
+                    f"Error: Invalid coordinate '{coordinates}'. Expected "
+                    "integers 'x,y'."
+                )
+            )
             sys.exit(0)
         return (x, y)
 
@@ -37,7 +50,10 @@ class ConfigPasrer:
             height_value = int(parsed_dict['HEIGHT'])
 
             if width_value < 9 or height_value < 7:
-                print("Error: Map dimensions must be at least 9x7 (WIDTH x HEIGHT).")
+                print(
+                    "Error: Map dimensions must be at least 9x7 "
+                    "(WIDTH x HEIGHT)."
+                )
                 sys.exit(0)
             if width_value > 200 or height_value > 200:
                 print("Error: Map dimensions must not exceed 200x200.")
@@ -87,7 +103,11 @@ class ConfigPasrer:
             return parsed_dict
         else:
             print(
-                f"Error: PERFECT must be 'True' or 'False'. Found '{parsed_dict['PERFECT']}'.")
+                (
+                    "Error: PERFECT must be 'True' or 'False'. "
+                    f"Found '{parsed_dict['PERFECT']}'."
+                )
+            )
             sys.exit(0)
             return parsed_dict
 
@@ -129,11 +149,17 @@ class ConfigPasrer:
                     value = parts[1].strip()
                     if key in parsed_dict:
                         print(
-                            f"Error: Duplicate key '{key}' found in config file.")
+                            (
+                                f"Error: Duplicate key '{key}' found in "
+                                "config file."
+                            )
+                        )
                         sys.exit(0)
                     parsed_dict[key] = value
                     # adding result to the dict
-                    # parsed_dict.update({parts[0].strip().upper() : parts[1].strip()})
+                    # parsed_dict.update(
+                    #     {parts[0].strip().upper(): parts[1].strip()}
+                    # )
         # handling if file was not found error
         except FileNotFoundError:
             print(f"Error: the file '{filename}' was not found")
@@ -159,9 +185,15 @@ class ConfigPasrer:
         self.parsed_dict = self.val_dimensions(self.parsed_dict)
 
         self.parsed_dict['ENTRY'] = self.parse_coordinate(
-            self.parsed_dict['ENTRY'], self.parsed_dict['HEIGHT'], self.parsed_dict['WIDTH'])
+            self.parsed_dict['ENTRY'],
+            self.parsed_dict['HEIGHT'],
+            self.parsed_dict['WIDTH'],
+        )
         self.parsed_dict['EXIT'] = self.parse_coordinate(
-            self.parsed_dict['EXIT'], self.parsed_dict['HEIGHT'], self.parsed_dict['WIDTH'])
+            self.parsed_dict['EXIT'],
+            self.parsed_dict['HEIGHT'],
+            self.parsed_dict['WIDTH'],
+        )
         if self.parsed_dict['ENTRY'] == self.parsed_dict['EXIT']:
             print("Error: 'ENTRY' and 'EXIT' coordinates cannot be the same!")
             sys.exit(0)
