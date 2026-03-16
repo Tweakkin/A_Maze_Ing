@@ -15,7 +15,7 @@ class ConfigPasrer:
         try:
             cords = coordinates.split(',')
             if len(cords) != 2:
-                print(f"Error: Expected format of EXIT AND ENTRY 'x,y'")
+                print("Error: Expected format of EXIT AND ENTRY 'x,y'")
                 sys.exit(0)
             x = int(cords[0])
             y = int(cords[1])
@@ -207,7 +207,7 @@ class ConfigPasrer:
             try:
                 self.parsed_dict['SEED'] = int(self.parsed_dict['SEED'])
             except ValueError:
-                print(f"Error: SEED must be an integer.")
+                print("Error: SEED must be an integer.")
                 sys.exit(0)
             self.bon_keys.remove('SEED')
         else:

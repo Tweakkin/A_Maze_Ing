@@ -30,11 +30,13 @@ def main():
         gen.set_42()
         if toparse.parsed_dict['ENTRY'] in gen.reserved:
             print(
-                f"Error: ENTRY {toparse.parsed_dict['ENTRY']} overlaps with the '42' pattern.")
+                f"Error: ENTRY {toparse.parsed_dict['ENTRY']}"
+                " overlaps with the '42' pattern.")
             sys.exit(0)
         if toparse.parsed_dict['EXIT'] in gen.reserved:
             print(
-                f"Error: EXIT {toparse.parsed_dict['EXIT']} overlaps with the '42' pattern.")
+                f"Error: EXIT {toparse.parsed_dict['EXIT']}"
+                " overlaps with the '42' pattern.")
             sys.exit(0)
         animate_generation(gen, algo=algo, delay=15)
         path = gen.solve_bfs(

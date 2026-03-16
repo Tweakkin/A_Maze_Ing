@@ -9,6 +9,8 @@ debug:
 
 clean:
 	rm -rf __pycache__ .mypy_cache
+	rm -f maze.txt
+	rm -rf dist
 
 lint:
 	flake8 .
@@ -19,4 +21,4 @@ lint-strict:
 	mypy . --strict
 
 build:
-	python3 -m build
+	poetry build
