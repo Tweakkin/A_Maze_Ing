@@ -217,6 +217,7 @@ def _draw_menu(stdscr: curses.window, start_row: int) -> None:
     for i, line in enumerate(MENU_LINES):
         stdscr.addstr(start_row + i, 0, line)
 
+
 def draw_generation_frame(
     stdscr: curses.window,
     maze_gen: 'MazeGenerator',
@@ -261,13 +262,24 @@ def _run_generation(
     stdscr.getch()
 
 
-def simple_menu_maze(maze_gen, path, algo="dfs", gen_delay=15):
+def simple_menu_maze(
+    maze_gen: 'MazeGenerator',
+    path: list[tuple[int, int]],
+    algo: str = "dfs",
+    gen_delay: int = 15,
+) -> None:
     # Start the interactive maze viewer with its control menu.
     curses.wrapper(lambda stdscr: _simple_menu_loop(
         stdscr, maze_gen, path, algo, gen_delay))
 
 
-def _simple_menu_loop(stdscr, maze_gen, path, algo, gen_delay):
+def _simple_menu_loop(
+    stdscr: curses.window,
+    maze_gen: 'MazeGenerator',
+    path: list[tuple[int, int]],
+    algo: str,
+    gen_delay: int,
+) -> None:
     # Process menu inputs for regeneration, path toggle, theme changes,
     # and exit.
     curses.curs_set(0)

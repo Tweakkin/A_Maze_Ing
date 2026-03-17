@@ -22,3 +22,4 @@ lint-strict:
 
 build:
 	poetry build
+	poetry install

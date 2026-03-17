@@ -77,8 +77,10 @@ class PrimGenerator(MazeGenerator):
                 animate_step(stdscr, self, delay, theme_index)
 
     def _get_frontier_walls(
-        self, x: int, y: int, in_maze: set, reserved: set
-    ) -> list:
+        self, x: int, y: int,
+        in_maze: set[tuple[int, int]],
+        reserved: set[tuple[int, int]],
+    ) -> list[tuple[int, int, int, int, int]]:
         # Return neighbor walls that can connect the current maze to new cells.
         walls = []
         for direction, (dx, dy) in DIRECTION_D.items():

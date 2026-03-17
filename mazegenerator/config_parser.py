@@ -3,16 +3,20 @@ import os
 from typing import Any
 
 
+# Class that reads a config file and validates all its fields
 class ConfigPasrer:
+    # Initializes the parser with the config filename
     def __init__(self, filename: str) -> None:
         self.filename = filename
         self.parsed_dict: dict[str, Any] = {}
         self.bon_keys: list[str] = []
 
+    # Parses and validates a coordinate string "x,y" against maze dimensions
     def parse_coordinate(
         self, coordinates: str, height: int, width: int
     ) -> tuple[int, int]:
         try:
+            # Split the string by comma to get x and y
             cords = coordinates.split(',')
             if len(cords) != 2:
                 print("Error: Expected format of EXIT AND ENTRY 'x,y'")
@@ -20,6 +24,7 @@ class ConfigPasrer:
             x = int(cords[0])
             y = int(cords[1])
 
+            # Check if coordinate is within maze bounds
             if x < 0 or x >= width or y < 0 or y >= height:
                 print(
                     (
@@ -44,17 +49,20 @@ class ConfigPasrer:
             sys.exit(0)
         return (x, y)
 
-    def val_dimensions(self, parsed_dict: dict) -> dict:
+    # Validates that WIDTH and HEIGHT are integers within allowed range
+    def val_dimensions(self, parsed_dict: dict[str, Any]) -> dict[str, Any]:
         try:
             width_value = int(parsed_dict['WIDTH'])
             height_value = int(parsed_dict['HEIGHT'])
 
+            # Minimum maze size is 9x7
             if width_value < 9 or height_value < 7:
                 print(
                     "Error: Map dimensions must be at least 9x7 "
                     "(WIDTH x HEIGHT)."
                 )
                 sys.exit(0)
+            # Maximum maze size is 200x200
             if width_value > 200 or height_value > 200:
                 print("Error: Map dimensions must not exceed 200x200.")
                 sys.exit(0)
@@ -65,7 +73,8 @@ class ConfigPasrer:
         parsed_dict['HEIGHT'] = height_value
         return parsed_dict
 
-    def val_keys(self, parsed_dict: dict) -> list[str]:
+    # Checks for missing mandatory keys and collects unsupported bonus keys
+    def val_keys(self, parsed_dict: dict[str, Any]) -> list[str]:
         allowed_keys = ['WIDTH', 'HEIGHT', 'ENTRY',
                         'EXIT', 'OUTPUT_FILE', 'PERFECT', 'ALGO']
         mandatory_keys = ['WIDTH', 'HEIGHT', 'ENTRY',
@@ -82,7 +91,8 @@ class ConfigPasrer:
                 sys.exit(0)
         return bonus_keys
 
-    def val_algo(self, parsed_dict: dict) -> dict:
+    # Validates that ALGO is either 'dfs' or 'prim'
+    def val_algo(self, parsed_dict: dict[str, Any]) -> dict[str, Any]:
         algo = parsed_dict.get('ALGO', 'dfs')
         algo = str(algo).strip().lower()
 
@@ -93,7 +103,8 @@ class ConfigPasrer:
         parsed_dict['ALGO'] = algo
         return parsed_dict
 
-    def val_bool(self, parsed_dict: dict) -> dict:
+    # Validates and converts PERFECT value from string to boolean
+    def val_bool(self, parsed_dict: dict[str, Any]) -> dict[str, Any]:
         parsed_dict['PERFECT'] = parsed_dict['PERFECT'].strip().lower()
         if parsed_dict['PERFECT'] == "true":
             parsed_dict['PERFECT'] = True
@@ -111,7 +122,8 @@ class ConfigPasrer:
             sys.exit(0)
             return parsed_dict
 
-    def val_file(self, parsed_dict: dict) -> None:
+    # Validates that OUTPUT_FILE is a valid .txt file path
+    def val_file(self, parsed_dict: dict[str, Any]) -> None:
         # does it end with .txt?
         if not parsed_dict['OUTPUT_FILE'].endswith('.txt'):
             print("Error: 'OUTPUT_FILE' must end with .txt")
@@ -126,7 +138,8 @@ class ConfigPasrer:
             print("Error: Path doesn't exist for 'OUTPUT_FILE'")
             sys.exit(0)
 
-    def file_to_dict(self, filename: str) -> dict:
+    # Reads the config file and converts key=value lines into a dictionary
+    def file_to_dict(self, filename: str) -> dict[str, Any]:
         try:
             with open(filename, "r") as file:
                 parsed_dict = {}
@@ -147,6 +160,7 @@ class ConfigPasrer:
                         continue
                     key = parts[0].strip().upper()
                     value = parts[1].strip()
+                    # Check for duplicate keys
                     if key in parsed_dict:
                         print(
                             (
@@ -174,6 +188,7 @@ class ConfigPasrer:
 
         return parsed_dict
 
+    # Main method that runs all validation steps in order
     def parse(self) -> None:
         # Turning the file into a dict
         self.parsed_dict = self.file_to_dict(self.filename)
@@ -184,25 +199,31 @@ class ConfigPasrer:
         # Validting the values of HEIGHT AND WIDTH
         self.parsed_dict = self.val_dimensions(self.parsed_dict)
 
+        # Parsing and validating ENTRY coordinate
         self.parsed_dict['ENTRY'] = self.parse_coordinate(
             self.parsed_dict['ENTRY'],
             self.parsed_dict['HEIGHT'],
             self.parsed_dict['WIDTH'],
         )
+        # Parsing and validating EXIT coordinate
         self.parsed_dict['EXIT'] = self.parse_coordinate(
             self.parsed_dict['EXIT'],
             self.parsed_dict['HEIGHT'],
             self.parsed_dict['WIDTH'],
         )
+        # ENTRY and EXIT must be different
         if self.parsed_dict['ENTRY'] == self.parsed_dict['EXIT']:
             print("Error: 'ENTRY' and 'EXIT' coordinates cannot be the same!")
             sys.exit(0)
 
+        # Validating PERFECT boolean and ALGO values
         self.parsed_dict = self.val_bool(self.parsed_dict)
         self.parsed_dict = self.val_algo(self.parsed_dict)
 
+        # Validating the output file path
         self.val_file(self.parsed_dict)
 
+        # Handling optional SEED key from bonus keys
         if 'SEED' in self.bon_keys:
             try:
                 self.parsed_dict['SEED'] = int(self.parsed_dict['SEED'])

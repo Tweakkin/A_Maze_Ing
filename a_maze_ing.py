@@ -12,7 +12,7 @@ SOUTH = 4
 WEST = 8
 
 
-def main():
+def main() -> None:
     if len(sys.argv) != 2:
         print("Error: Usage is python3 a_maze_ing.py <config_file>")
         sys.exit(0)
