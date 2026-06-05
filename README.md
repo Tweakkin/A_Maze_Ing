@@ -3,7 +3,7 @@ s*This project has been created as part of the 42 curriculum by mokarimi and ybo
 # A-Maze-Ing
 
 ### 🎬 Maze Overview
-<video src="maze_vid.webm" width="700" controls></video>
+<video src="amaze_vid.webm" width="700" controls></video>
 
 ## Description
 
