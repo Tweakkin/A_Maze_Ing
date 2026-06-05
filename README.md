@@ -2,6 +2,9 @@
 
 # A-Maze-Ing
 
+### 🎬 Gameplay Overview
+<img src="maze_vid" alt="Gameplay Demo" width="700">
+
 ## Description
 
 A maze generator and solver in Python. It reads a configuration file, generates a maze
