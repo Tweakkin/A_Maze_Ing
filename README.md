@@ -1,9 +1,9 @@
-*This project has been created as part of the 42 curriculum by mokarimi and yboukhmi.*
+s*This project has been created as part of the 42 curriculum by mokarimi and yboukhmi.*
 
 # A-Maze-Ing
 
 ### 🎬 Maze Overview
-<video src="maze_vid.mp4" width="700" controls></video>
+<video src="maze_vid.webm" width="700" controls></video>
 
 ## Description
 
