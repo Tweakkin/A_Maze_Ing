@@ -2,8 +2,8 @@
 
 # A-Maze-Ing
 
-### 🎬 Gameplay Overview
-<img src="maze_vid" alt="Gameplay Demo" width="700">
+### 🎬 Maze Overview
+<video src="maze_vid.mp4" width="700" controls></video>
 
 ## Description
 
